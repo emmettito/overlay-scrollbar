@@ -1,0 +1,4 @@
+# LF everywhere, also in Windows checkouts: Prettier formats to LF, and the husky hooks are shell scripts
+* text=auto eol=lf
+*.ico binary
+*.png binary

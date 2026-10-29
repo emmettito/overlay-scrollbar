@@ -1,0 +1,27 @@
+# Built: the library (npm run build:lib), the app (npm run build), and the framework demos it shows
+/lib
+/dist
+/public/frameworks/
+
+# Node
+/node_modules
+npm-debug.log
+
+# Test output: coverage, and Vitest's screenshots of failed browser specs
+/coverage
+__screenshots__/
+
+# Editors: only the shared VS Code settings are kept
+.idea/
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Recordings
+*.mp4
