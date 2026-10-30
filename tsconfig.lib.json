@@ -1,0 +1,28 @@
+// The library: src/overlay-scrollbar compiled to JavaScript and type declarations in lib/. Node's module rules, as
+// packages are loaded by them as well as by bundlers: a relative import without its .js extension is an error here, as
+// it would fail in webpack 5 and Node.
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "types": [],
+    "strict": true,
+    "noImplicitOverride": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "isolatedModules": true,
+    "skipLibCheck": true,
+    "rootDir": "src/overlay-scrollbar",
+    "outDir": "lib",
+    "declaration": true,
+    // Source maps with the TypeScript inside them, as the package ships lib/ but not src/
+    "sourceMap": true,
+    "inlineSources": true,
+    "removeComments": false
+  },
+  "include": ["src/overlay-scrollbar"],
+  "exclude": ["src/overlay-scrollbar/**/*.spec.ts", "src/overlay-scrollbar/vitest-setup.ts"]
+}

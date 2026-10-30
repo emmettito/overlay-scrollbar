@@ -1,4 +1,4 @@
-// The ESLint config, which runs in Node rather than the browser
+// The ESLint and Vitest configs, which run in Node rather than the browser
 {
   "compilerOptions": {
     "target": "ES2023",
@@ -15,5 +15,5 @@
     "erasableSyntaxOnly": true,
     "verbatimModuleSyntax": true
   },
-  "include": ["eslint.config.mts"]
+  "include": ["eslint.config.mts", "vitest.config.mts"]
 }

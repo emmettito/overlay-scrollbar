@@ -1,0 +1,249 @@
+/* overlay-scrollbar: the stylesheet the bars need. The overlay-scrollbar layer must be declared before any other, so
+   every other style overrides it: either list it first in the page's layer order, or import this file first (see
+   README.md).
+
+   Measured from Safari on macOS: an 11px pill track inset 3px from the edges, shown only while the pointer is on the
+   bar; a thumb that is 6px while scrolling and fills the track when the pointer is on the bar, with its outer edge
+   fixed so it grows inwards. Shown instantly, faded out as a whole. The colours were matched side by side with Safari's
+   own scrollbars in a screen recording: black at 50% for the thumb (60% under the pointer) and 4.7% for the track.
+
+   The --overlay-scrollbar-* custom properties theme it (listed in README.md). The --_overlay-scrollbar-* ones, with
+   the leading underscore, are internal: they're set on the frame, by overlay-scrollbar-frame.ts or below, so they
+   never reach the element's content or a nested scroller. */
+
+/* Outside the layer: whatever else styles the element's scrollbars, the native ones mustn't show under the bars.
+   (scrollbar-width: none, set inline, hides them everywhere else.) */
+.overlay-scrollbar-host::-webkit-scrollbar {
+  display: none;
+}
+
+/* Everything else is in a layer, so any of the page's own styles override it, Tailwind utilities included: unlayered
+   styles beat layered ones, and this layer is declared before any other (see the top of this file). */
+@layer overlay-scrollbar {
+  /* Positioned, so a nested element's frame, absolutely positioned inside it, is clipped by it and scrolls with its
+     content: otherwise the frame's containing block is further out, and the nested element's bars would show, and take
+     the pointer, past this element's edges whenever the nested one is partly scrolled out of sight. */
+  .overlay-scrollbar-host {
+    position: relative;
+  }
+
+  /* The bars are drawn in a frame placed right after the element and laid over its visible area with CSS anchor
+     positioning (anchor-name on the element, position-anchor on the frame, both set by overlay-scrollbar-frame.ts).
+     Outside the element, the bars aren't part of its scrolling content, so no browser's bounce past the ends moves
+     them. Hidden while the element is out of sight. Contained, so moving and resizing the thumbs never lays out the
+     scrolling element: Safari clamps a keyboard scroll back into range whenever it does, which kills the rubber-band. */
+  .overlay-scrollbar-frame {
+    --_overlay-scrollbar-width: var(--overlay-scrollbar-width, 6px);
+    --_overlay-scrollbar-expanded-width: var(--overlay-scrollbar-expanded-width, 11px);
+    --_overlay-scrollbar-inset: var(--overlay-scrollbar-inset, 3px);
+    --_overlay-scrollbar-radius: var(--overlay-scrollbar-radius, var(--_overlay-scrollbar-expanded-width));
+    --_overlay-scrollbar-expand: var(--overlay-scrollbar-expand-duration, 0.15s) ease-out;
+    --_overlay-scrollbar-corner: var(--overlay-scrollbar-corner, 0px);
+    position: absolute;
+    top: calc(anchor(top) + var(--_overlay-scrollbar-border-top, 0px));
+    left: calc(anchor(left) + var(--_overlay-scrollbar-border-left, 0px));
+    width: var(--_overlay-scrollbar-client-width);
+    height: var(--_overlay-scrollbar-client-height);
+    position-visibility: anchors-visible;
+    /* Above the page's own content; --_overlay-scrollbar-depth is how many attached elements this one is nested in, so
+       nested bars go above their parents'. A known limit: it's also above overlays with a lower z-index (README.md). */
+    z-index: calc(999 + var(--_overlay-scrollbar-depth, 0));
+    contain: strict;
+    pointer-events: none;
+    /* Dragging a thumb mustn't start a text selection (iPadOS does with its pointer) or a touch callout */
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+  }
+
+  /* The bar is the whole edge strip, inset included, so the edge of the box is hoverable */
+  /* touch-action: a touch on the bar drags the thumb or pages, rather than panning the content (the opposite way) */
+  .overlay-scrollbar-bar {
+    position: absolute;
+    pointer-events: auto;
+    touch-action: none;
+    /* The arrow, as over native scrollbars, rather than whatever the element uses (e.g. a code editor's I-beam) */
+    cursor: default;
+    /* Hidden, or with --overlay-scrollbar-idle-opacity, faintly showing while not in use */
+    opacity: var(--overlay-scrollbar-idle-opacity, 0);
+    transition: opacity var(--overlay-scrollbar-fade-duration, 0.25s) linear;
+  }
+
+  /* Bars that stay showing leave room for each other in the corner, like classic scrollbars */
+  .overlay-scrollbar-always {
+    --_overlay-scrollbar-corner: var(
+      --overlay-scrollbar-corner,
+      calc(var(--_overlay-scrollbar-expanded-width) + var(--_overlay-scrollbar-inset))
+    );
+  }
+
+  /* Where both show and overlap in the corner, the bar in use goes on top */
+  .overlay-scrollbar-front {
+    z-index: 1;
+  }
+
+  /* Hidden when the element can't scroll that way; .overlay-scrollbar-visible is whether a scrollable bar is showing */
+  .overlay-scrollbar-bar[hidden] {
+    display: none;
+  }
+
+  .overlay-scrollbar-visible {
+    opacity: 1;
+    transition: none;
+  }
+
+  /* Shown by the pointer coming onto the element (autoHide 'leave'), rather than by scrolling or hovering a bar */
+  .overlay-scrollbar-visible.overlay-scrollbar-fade-in {
+    transition: opacity var(--overlay-scrollbar-fade-in-duration, 0.2s) linear;
+  }
+
+  /* The track: only coloured while expanded */
+  .overlay-scrollbar-bar::before {
+    content: '';
+    position: absolute;
+    border-radius: var(--_overlay-scrollbar-radius);
+  }
+
+  .overlay-scrollbar-expanded::before {
+    background-color: var(--overlay-scrollbar-track-color, rgb(0 0 0 / 0.047));
+  }
+
+  .overlay-scrollbar-thumb {
+    position: absolute;
+    border-radius: var(--_overlay-scrollbar-radius);
+    background-color: var(--overlay-scrollbar-thumb-color, rgb(0 0 0 / 0.5));
+  }
+
+  .overlay-scrollbar-thumb:hover,
+  .overlay-scrollbar-dragging > .overlay-scrollbar-thumb {
+    background-color: var(--overlay-scrollbar-thumb-hover-color, rgb(0 0 0 / 0.6));
+  }
+
+  .overlay-scrollbar-bar-y {
+    top: var(--_overlay-scrollbar-inset);
+    bottom: var(--_overlay-scrollbar-inset);
+    inset-inline-end: 0;
+    width: calc(var(--_overlay-scrollbar-expanded-width) + var(--_overlay-scrollbar-inset));
+  }
+
+  .overlay-scrollbar-both > .overlay-scrollbar-bar-y {
+    bottom: calc(var(--_overlay-scrollbar-inset) + var(--_overlay-scrollbar-corner));
+  }
+
+  /* The track grows with the thumb, from the same fixed outer edge */
+  .overlay-scrollbar-bar-y::before {
+    inset-block: 0;
+    inset-inline-end: var(--_overlay-scrollbar-inset);
+    width: var(--_overlay-scrollbar-width);
+    transition: width var(--_overlay-scrollbar-expand);
+  }
+
+  .overlay-scrollbar-bar-y.overlay-scrollbar-expanded::before {
+    width: var(--_overlay-scrollbar-expanded-width);
+  }
+
+  .overlay-scrollbar-bar-y > .overlay-scrollbar-thumb {
+    top: 0;
+    inset-inline-end: var(--_overlay-scrollbar-inset);
+    width: var(--_overlay-scrollbar-width);
+    height: var(--_overlay-scrollbar-thumb-y);
+    transition: width var(--_overlay-scrollbar-expand);
+  }
+
+  .overlay-scrollbar-bar-y.overlay-scrollbar-expanded > .overlay-scrollbar-thumb {
+    width: var(--_overlay-scrollbar-expanded-width);
+  }
+
+  .overlay-scrollbar-bar-x {
+    bottom: 0;
+    inset-inline: var(--_overlay-scrollbar-inset);
+    height: calc(var(--_overlay-scrollbar-expanded-width) + var(--_overlay-scrollbar-inset));
+  }
+
+  .overlay-scrollbar-both > .overlay-scrollbar-bar-x {
+    inset-inline-end: calc(var(--_overlay-scrollbar-inset) + var(--_overlay-scrollbar-corner));
+  }
+
+  .overlay-scrollbar-bar-x::before {
+    inset-inline: 0;
+    bottom: var(--_overlay-scrollbar-inset);
+    height: var(--_overlay-scrollbar-width);
+    transition: height var(--_overlay-scrollbar-expand);
+  }
+
+  .overlay-scrollbar-bar-x.overlay-scrollbar-expanded::before {
+    height: var(--_overlay-scrollbar-expanded-width);
+  }
+
+  .overlay-scrollbar-bar-x > .overlay-scrollbar-thumb {
+    bottom: var(--_overlay-scrollbar-inset);
+    inset-inline-start: 0;
+    width: var(--_overlay-scrollbar-thumb-x);
+    height: var(--_overlay-scrollbar-width);
+    transition: height var(--_overlay-scrollbar-expand);
+  }
+
+  .overlay-scrollbar-bar-x.overlay-scrollbar-expanded > .overlay-scrollbar-thumb {
+    height: var(--_overlay-scrollbar-expanded-width);
+  }
+
+  /* Windows High Contrast (forced colours) replaces the translucent colours with the page background, which would leave
+     no scroll indicator at all, the native scrollbars being hidden: the bars use the system colours instead */
+  @media (forced-colors: active) {
+    .overlay-scrollbar-thumb,
+    .overlay-scrollbar-expanded::before {
+      forced-color-adjust: none;
+    }
+
+    .overlay-scrollbar-thumb {
+      background-color: CanvasText;
+    }
+
+    .overlay-scrollbar-thumb:hover,
+    .overlay-scrollbar-dragging > .overlay-scrollbar-thumb {
+      background-color: Highlight;
+    }
+
+    .overlay-scrollbar-expanded::before {
+      background-color: Canvas;
+      outline: 1px solid CanvasText;
+    }
+  }
+
+  /* See utilities/without-transitions.ts */
+  .overlay-scrollbar-no-transition,
+  .overlay-scrollbar-no-transition::before,
+  .overlay-scrollbar-no-transition > .overlay-scrollbar-thumb {
+    transition: none !important;
+  }
+
+  /* In Chromium the thumbs follow the element's named scroll timelines on the compositor; elsewhere the scroll listener
+     moves them */
+  .overlay-scrollbar-scroll-timeline > .overlay-scrollbar-bar-x > .overlay-scrollbar-thumb {
+    animation: overlay-scrollbar-thumb-x linear both;
+    animation-timeline: var(--_overlay-scrollbar-timeline-x);
+  }
+
+  .overlay-scrollbar-scroll-timeline > .overlay-scrollbar-bar-y > .overlay-scrollbar-thumb {
+    animation: overlay-scrollbar-thumb-y linear both;
+    animation-timeline: var(--_overlay-scrollbar-timeline-y);
+  }
+
+  @keyframes overlay-scrollbar-thumb-x {
+    from {
+      translate: 0 0;
+    }
+    to {
+      translate: var(--_overlay-scrollbar-travel-x) 0;
+    }
+  }
+
+  @keyframes overlay-scrollbar-thumb-y {
+    from {
+      translate: 0 0;
+    }
+    to {
+      translate: 0 var(--_overlay-scrollbar-travel-y);
+    }
+  }
+}
