@@ -1,6 +1,6 @@
 # overlay-scrollbar
 
-Overlay scrollbars for any scrollable element. Scrolling stays native: the library hides the element's own scrollbars and draws thin bars over its content, which widen under the pointer and fade out when scrolling stops.
+Overlay scrollbars for any scrollable element, in plain TypeScript with no dependencies.
 
 The bars show wherever there's a mouse or trackpad. Touch-only devices, and browsers without CSS anchor positioning, keep their native scrollbars.
 
@@ -35,6 +35,7 @@ scrollbar.update(); // after a size change the bars can't see (see Limits)
 scrollbar.destroy(); // removes the bars and restores the element
 ```
 
+- Scrolling stays native: the library hides the element's own scrollbars and draws thin bars over its content. By default they widen when the pointer rests on them and fade out shortly after scrolling stops.
 - The bars follow the element's size, content and text direction on their own.
 - Attaching to the same element again replaces its bars, e.g. with new options.
 - An element attached before it's in the page gets its bars once it's added.
