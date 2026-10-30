@@ -31,7 +31,7 @@ npm run test           # the unit specs, in jsdom
 npm run test:browser   # the browser specs, in Chromium, WebKit and Firefox
 npm run build:lib      # builds the library into lib/
 npm run package        # builds and packs it as overlay-scrollbar-<version>.tgz
-npm run release        # builds it and publishes it to npm
+npm run release        # builds it and publishes it to npm (-- --stage to stage it for approval)
 npm run test:package   # packs it, installs it in a temporary project, and checks it works there
 npm run bench          # performance against native scrollbars, in all three browsers (several minutes)
 ```
@@ -40,7 +40,7 @@ The browser specs and the benchmark need Playwright's browsers: `npx playwright 
 
 `npm pack` and `npm publish` are refused from the repository root, because they'd include the repository's own scripts and settings. Use `npm run package` and `npm run release` instead.
 
-To publish a new version, change `version` in `package.json` in a pull request, then publish a GitHub release tagged with it (e.g. `v0.2.0`). The Publish workflow publishes it to npm, with provenance.
+To publish a new version, change `version` in `package.json` in a pull request, then publish a GitHub release tagged with it (e.g. `v0.2.0`). The Publish workflow stages it on npm, with provenance, and it's published once you approve it on npmjs.com, or with `npm stage list` and `npm stage approve <id>`.
 
 ## What's where
 
