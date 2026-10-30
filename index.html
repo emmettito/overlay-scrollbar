@@ -34,16 +34,20 @@
     </header>
     <div class="nav-backdrop"></div>
     <nav id="nav">
-      <a href="#/">Home</a>
-      <a href="#/list">List</a>
-      <a href="#/changing-content">Changing content</a>
-      <a href="#/table">Table</a>
-      <a href="#/dialog">Dialog</a>
-      <a href="#/nested">Nested scroll areas</a>
-      <a href="#/rtl">Right-to-left</a>
-      <a href="#/virtual">Virtual scrolling</a>
-      <a href="#/drag-drop">Drag and drop</a>
-      <a href="#/styling">Styling</a>
+      <!-- Scrolls on a short screen, with the library's bars (src/main.ts). Inside the nav, so its bars slide out with it
+           on narrow screens. -->
+      <div class="nav-links">
+        <a href="#/">Home</a>
+        <a href="#/list">List</a>
+        <a href="#/table">Table</a>
+        <a href="#/changing-content">Changing content</a>
+        <a href="#/nested">Nested scroll areas</a>
+        <a href="#/dialog">Dialog</a>
+        <a href="#/rtl">Right-to-left</a>
+        <a href="#/virtual">Virtual scrolling</a>
+        <a href="#/drag-drop">Drag and drop</a>
+        <a href="#/styling">Styling</a>
+      </div>
       <button type="button" class="theme-toggle" role="switch" aria-checked="false">
         Dark theme<span class="switch" aria-hidden="true"></span>
       </button>

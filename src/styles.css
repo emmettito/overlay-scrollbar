@@ -59,7 +59,10 @@ body {
   -webkit-font-smoothing: antialiased;
   display: grid;
   grid-template-columns: 220px minmax(0, 1fr);
-  align-items: start;
+  /* The page never scrolls: main does, and the nav's links, so both can have the library's bars (src/main.ts), which
+     the page itself can't */
+  height: 100dvh;
+  overflow: hidden;
 }
 h1 {
   font-size: 20px;
@@ -265,6 +268,11 @@ input[type='range']::-moz-range-thumb {
   gap: 24px;
   align-items: flex-start;
 }
+/* Each side of a comparison the same width on every page, so they all go one above the other at the same screen width */
+.panels > section {
+  width: 320px;
+  max-width: 100%;
+}
 .panel {
   background: var(--surface);
   border: 1px solid var(--border);
@@ -281,19 +289,22 @@ input[type='range']::-moz-range-thumb {
 .links li {
   margin-bottom: 8px;
 }
-/* The nav in a sidebar on the left, staying put as the page scrolls */
+/* The nav in a sidebar on the left: the links, scrolling if the screen is too short for them, then the theme switch */
 nav {
-  position: sticky;
-  top: 0;
-  box-sizing: border-box;
-  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  background: var(--sidebar);
+  border-right: 1px solid var(--border);
+}
+.nav-links {
+  flex: 1;
+  min-height: 0;
   overflow: auto;
   display: flex;
   flex-direction: column;
   gap: 1px;
   padding: 16px 10px;
-  background: var(--sidebar);
-  border-right: 1px solid var(--border);
 }
 nav a {
   color: var(--text-muted);
@@ -312,8 +323,9 @@ nav a.active {
 }
 /* A switch at the bottom of the sidebar: on for the dark theme */
 .theme-toggle {
+  flex: none;
   height: auto;
-  margin-top: auto;
+  margin: 0 10px 16px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -355,6 +367,8 @@ nav a.active {
   translate: 10px;
 }
 main {
+  min-height: 0;
+  overflow: auto;
   padding: 28px 32px;
 }
 /* On narrow screens, back to a bar across the top */
@@ -367,15 +381,10 @@ main {
    stylesheets: change them together. */
 @media (max-width: 720px) {
   body {
-    display: block;
-  }
-  body.nav-open {
-    overflow: hidden;
+    display: flex;
+    flex-direction: column;
   }
   .topbar {
-    position: sticky;
-    top: 0;
-    z-index: 1100;
     display: flex;
     align-items: center;
     gap: 8px;
@@ -434,6 +443,10 @@ main {
     transition: translate 0.2s;
   }
   main {
+    flex: 1;
     padding: 20px 16px;
+  }
+  .panels > section {
+    width: 100%;
   }
 }

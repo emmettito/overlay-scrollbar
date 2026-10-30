@@ -68,11 +68,39 @@ function file(id: number): File {
 
 const files = (from: number, count: number): File[] => Array.from({ length: count }, (_, i) => file(from + i));
 
-// A recent-activity feed, long enough to scroll sideways
-const actions = ['commented on', 'renamed', 'shared', 'moved', 'edited', 'starred', 'duplicated', 'restored'];
-const rows = files(1, 30).map(
-  (f, i) => `${f.owner} ${actions[(i * 3) % actions.length]} ${f.name} · ${(i % 9) + 1} min ago`
-);
+// Books and their authors, some long enough to scroll sideways
+const books = [
+  ['Pride and Prejudice', 'Jane Austen'],
+  ['One Hundred Years of Solitude', 'Gabriel García Márquez'],
+  ['The Left Hand of Darkness', 'Ursula K. Le Guin'],
+  ['Beloved', 'Toni Morrison'],
+  ['The Strange Case of Dr Jekyll and Mr Hyde', 'Robert Louis Stevenson'],
+  ['Middlemarch', 'George Eliot'],
+  ['The Brief Wondrous Life of Oscar Wao', 'Junot Díaz'],
+  ['Things Fall Apart', 'Chinua Achebe'],
+  ['To Kill a Mockingbird', 'Harper Lee'],
+  ['The Hitchhiker’s Guide to the Galaxy', 'Douglas Adams'],
+  ['Frankenstein', 'Mary Shelley'],
+  ['The Remains of the Day', 'Kazuo Ishiguro'],
+  ['Their Eyes Were Watching God', 'Zora Neale Hurston'],
+  ['Moby-Dick', 'Herman Melville'],
+  ['The Curious Incident of the Dog in the Night-Time', 'Mark Haddon'],
+  ['Jane Eyre', 'Charlotte Brontë'],
+  ['The Master and Margarita', 'Mikhail Bulgakov'],
+  ['Kindred', 'Octavia E. Butler'],
+  ['Wide Sargasso Sea', 'Jean Rhys'],
+  ['The Unbearable Lightness of Being', 'Milan Kundera'],
+  ['Great Expectations', 'Charles Dickens'],
+  ['The God of Small Things', 'Arundhati Roy'],
+  ['Slaughterhouse-Five', 'Kurt Vonnegut'],
+  ['The Count of Monte Cristo', 'Alexandre Dumas'],
+  ['Mrs Dalloway', 'Virginia Woolf'],
+  ['The Name of the Rose', 'Umberto Eco'],
+  ['Do Androids Dream of Electric Sheep?', 'Philip K. Dick'],
+  ['Crime and Punishment', 'Fyodor Dostoevsky'],
+  ['If on a Winter’s Night a Traveler', 'Italo Calvino'],
+  ['The Lord of the Rings', 'J. R. R. Tolkien']
+];
 
 /** Native on the left, the library on the right: `box` gets the box's attributes (`data-lib` on the right) */
 function sides(box: (attributes: Html) => Html): Html {
@@ -90,13 +118,11 @@ function sides(box: (attributes: Html) => Html): Html {
   `;
 }
 
-/** A comparison page's heading and note, which says which side is which */
+/** A comparison page's heading and note; each side's label says which it is */
 function intro(title: string, note: string): Html {
   return html`
     <h1>${title}</h1>
-    <p class="note">
-      Native scrollbars on the left, the library's on the right. ${note}
-    </p>
+    <p class="note">${note}</p>
   `;
 }
 
@@ -116,7 +142,13 @@ function comparison(title: string, note: string, content: Html): Page {
 export const list = comparison(
   'List',
   'Try hovering the bars, dragging, flicking past the ends, and the arrow keys.',
-  sides(lib => html`<div class="box" ${lib}>${rows.map(r => html`<p>${r}</p>`)}</div>`)
+  sides(
+    lib => html`
+    <div class="box" ${lib}>
+      ${books.map(([title, author]) => html`<p>${title} <span class="muted">${author}</span></p>`)}
+    </div>
+  `
+  )
 );
 
 export const table = comparison(
@@ -190,12 +222,30 @@ export const dialog: Page = {
       main,
       html`
       <div class="compare">
-        ${intro('Dialog', 'Bars inside a modal dialog, above the page.')}
-        <button type="button" class="primary" data-action="open">Open dialog</button>
+        ${intro(
+          'Dialog',
+          'A modal dialog opens in the browser’s top layer, above everything else in the page, whatever its z-index. ' +
+            'The bars of the lists inside it open there with it, and the page’s own bars stay behind the backdrop: the ' +
+            'list below keeps its bars showing, so you can see the dialog cover them.'
+        )}
+        <div class="controls">
+          <button type="button" class="primary" data-action="open">Open dialog</button>
+        </div>
+        ${sides(
+          lib => html`
+          <div class="box" ${lib}>
+            ${books.map(([title, author]) => html`<p>${title} <span class="muted">${author}</span></p>`)}
+          </div>
+        `
+        )}
         <dialog class="dialog" aria-label="Recent files"></dialog>
       </div>
     `
     );
+
+    // The page's list, its bars never hiding, so anything that leaked through the backdrop would show
+    const pageBars = new Bars();
+    pageBars.attach(find(main, '.compare > .panels [data-lib]'), { autoHide: false });
 
     const bars = new Bars();
     // A modal <dialog> is in the top layer, above everything in the page, the page's own bars included (their frames
@@ -239,6 +289,9 @@ export const dialog: Page = {
       }
     });
 
-    return () => bars.destroy();
+    return () => {
+      bars.destroy();
+      pageBars.destroy();
+    };
   }
 };

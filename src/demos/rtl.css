@@ -1,5 +1,4 @@
 .rtl .box {
-  width: 340px;
   overflow: auto;
   background: var(--surface);
   border: 1px solid var(--border);
@@ -9,4 +8,8 @@
   margin: 0;
   padding: 6px 12px;
   border-bottom: 1px solid var(--border-subtle);
+}
+/* No line under the last row, where the box's border already is */
+.rtl .box p:last-child {
+  border-bottom: 0;
 }

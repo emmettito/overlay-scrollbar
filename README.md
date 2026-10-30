@@ -22,7 +22,7 @@ Options, theming and limits are in the [library's README](src/overlay-scrollbar/
 
 ## Developing
 
-You need Node 22.18 or later and npm 12 or later. If your Node came with an older npm, run `npm install -g npm@12` first.
+You need Node 22.18 or later and npm 12 or later.
 
 ```sh
 npm install
@@ -37,8 +37,6 @@ npm run bench          # performance against native scrollbars, in all three bro
 ```
 
 The browser specs and the benchmark need Playwright's browsers: `npx playwright install chromium webkit firefox`, with `--with-deps` on Linux.
-
-Once `npm install` has run, committing runs ESLint and Prettier on the staged files, and stops the commit if ESLint finds anything it can't fix, warnings included.
 
 `npm pack` and `npm publish` are refused from the repository root, because they'd include the repository's own scripts and settings. Use `npm run package` instead.
 

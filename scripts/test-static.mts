@@ -12,12 +12,12 @@ const page = pathToFileURL(join(root, 'dist/index.html')).href;
 
 // Each route, and how many of the page's own frames (bars) it should have
 const routes = {
-  '': 1,
+  '': 7,
   list: 1,
-  'changing-content': 1,
   table: 1,
-  dialog: 0,
+  'changing-content': 1,
   nested: 5,
+  dialog: 1,
   rtl: 2,
   virtual: 1,
   'drag-drop': 2,
@@ -61,6 +61,17 @@ for (const [name, type, env] of browsers) {
     } else if (drawn !== bars) {
       fail(`#/${route} has ${drawn} bars, not ${bars}`);
     }
+  }
+
+  // The app scrolls main and the nav's links rather than the page, with the library's bars
+  const appBars = await tab.evaluate(() =>
+    ['main', '.nav-links'].filter(selector => {
+      const next = document.querySelector(selector)?.nextElementSibling;
+      return next?.classList.contains('overlay-scrollbar-frame');
+    })
+  );
+  if (appBars.length !== 2) {
+    fail(`only ${appBars.join(' and ') || 'nothing'} of main and the nav's links has bars`);
   }
 
   // The Styling page's Cascade layers example: the later layer's colour wins
@@ -135,9 +146,13 @@ for (const [name, type, env] of browsers) {
   for (const route of Object.keys(routes)) {
     await tab.goto(`${page}#/${route}`);
     await tab.waitForTimeout(200);
-    const width = await tab.evaluate(() => document.documentElement.scrollWidth);
-    if (width > 390) {
-      fail(`#/${route} is ${width}px wide on a 390px screen`);
+    // Main, rather than the page, as main is what scrolls
+    const { width, room } = await tab.evaluate(() => {
+      const main = document.querySelector('main');
+      return { width: main?.scrollWidth ?? 0, room: main?.clientWidth ?? 0 };
+    });
+    if (width > room) {
+      fail(`#/${route} is ${width}px wide in ${room}px on a 390px screen`);
     }
   }
   await tab.goto(`${page}#/list`);

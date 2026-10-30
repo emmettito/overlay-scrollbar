@@ -1,6 +1,4 @@
 .virtual .list {
-  width: 320px;
-  max-width: calc(100vw - 32px);
   height: 420px;
   overflow: auto;
   background: var(--surface);
@@ -24,6 +22,11 @@
   align-items: center;
   white-space: nowrap;
   overflow: hidden;
+}
+/* No line under the last row, where the list's border already is. The last row rendered is either that or out of
+   view, below the rows in view. */
+.virtual .row:last-child {
+  border-bottom: 0;
 }
 .virtual .wide .row {
   width: 760px;

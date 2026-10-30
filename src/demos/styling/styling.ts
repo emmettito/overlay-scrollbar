@@ -114,8 +114,8 @@ export const styling: Page = {
       html`
       <h1>Styling</h1>
       <p class="note">
-        Each example shows the code that makes it: the CSS, and the options passed when attaching. Every custom property
-        and option is listed in the
+        Open an example's Code to see its CSS or JavaScript. Every custom property and option is listed in
+        the
         <a href="https://github.com/emmettito/overlay-scrollbar/blob/main/src/overlay-scrollbar/README.md">library's README</a>.
       </p>
 

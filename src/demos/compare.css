@@ -1,5 +1,4 @@
 .compare .box {
-  width: 320px;
   height: 360px;
   overflow: auto;
   background: var(--surface);
@@ -12,11 +11,21 @@
   padding: 6px 10px;
   border-bottom: 1px solid var(--border-subtle);
 }
+/* The last row's line as a shadow rather than a border: a shadow isn't part of what scrolls, so in a full box it falls
+   outside, under the box's own border, and only shows under a short list */
+.compare .box p:last-child,
+.compare tbody tr:last-child td {
+  border-bottom: 0;
+  box-shadow: 0 1px var(--border-subtle);
+}
 .compare .note {
   margin-bottom: 12px;
 }
+/* Separate borders, so the header row's stays under it as it sticks: a collapsed border belongs to the table, and
+   scrolls away */
 .compare table {
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
 }
 .compare th,
 .compare td {
@@ -28,6 +37,7 @@
   position: sticky;
   top: 0;
   background: var(--surface-muted);
+  border-bottom-color: var(--border);
 }
 .compare .dialog {
   margin: 80px auto auto;
@@ -60,7 +70,6 @@
   padding: 14px 20px 18px;
 }
 .compare .dialog-box {
-  width: 260px;
   height: 280px;
 }
 /* The actions, on the right under a hairline */
@@ -80,17 +89,13 @@
   color: var(--text-faint);
   font-variant-numeric: tabular-nums;
 }
-/* On narrow screens (the same breakpoint as styles.css and src/menu.ts), the dialog near the top, and its lists, one
-   above the other, shorter */
+/* On narrow screens (the same breakpoint as styles.css and src/menu.ts), the dialog near the top, and its lists
+   shorter */
 @media (max-width: 720px) {
   .compare .dialog {
     margin-top: 16px;
   }
-  .compare .dialog .panels > section {
-    width: 100%;
-  }
   .compare .dialog-box {
-    width: auto;
     height: 200px;
   }
 }

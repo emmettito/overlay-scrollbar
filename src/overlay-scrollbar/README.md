@@ -21,8 +21,6 @@ Include the stylesheet first. Without it, the native scrollbars are hidden and n
 import '@emmettito/overlay-scrollbar/overlay-scrollbar.css';
 ```
 
-If your build doesn't import CSS from JavaScript, add the file to its global stylesheets or link to it from the page.
-
 The styles sit in the `overlay-scrollbar` cascade layer, so any of your own styles override them. That layer has to come first: include the stylesheet before any other, or list it first in your layer order, e.g. `@layer overlay-scrollbar, base, components;`.
 
 Then attach the bars to an element with `overflow: auto` or `scroll`:
@@ -39,7 +37,6 @@ scrollbar.destroy(); // removes the bars and restores the element
 - The bars follow the element's size, content and text direction on their own.
 - Attaching to the same element again replaces its bars, e.g. with new options.
 - An element attached before it's in the page gets its bars once it's added.
-- In a component, attach the bars once the element has rendered, again when the options change, and destroy them when the element is removed.
 - The page itself can't have bars (`document.documentElement`, or the body while it scrolls the page). Put the page's content in a scrolling element of its own instead.
 
 ### Attaching by selector
