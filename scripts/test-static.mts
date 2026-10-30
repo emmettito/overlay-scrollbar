@@ -92,10 +92,12 @@ for (const [name, type, env] of browsers) {
       .getByText('Add 10 items')
       .click({ timeout: 5000 })
       .catch(() => undefined);
-    const count = await demo
-      .locator('.count')
-      .textContent({ timeout: 5000 })
-      .catch(() => null);
+    // Waits for it, as a framework can update the page a little after the click (Angular, on a slow machine)
+    await demo
+      .locator('.count', { hasText: '40 items' })
+      .waitFor({ timeout: 5000 })
+      .catch(() => undefined);
+    const count = await demo.locator('.count').textContent();
     if (demoBars !== 1 || count !== '40 items') {
       fail(`the ${framework} demo has ${demoBars} bars and reads ${count} after adding 10 items`);
     }
