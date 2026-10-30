@@ -36,3 +36,22 @@ jobs:
       - run: npx playwright install --with-deps chromium webkit firefox
       - run: npm run test:browser
       - run: npm run test:static
+
+  # The browser specs again on the other platforms, each in the browser closest to its own: WebKit on macOS, whose
+  # scrollbars and scrolling are much closer to Safari's than Linux's WebKit, and Chromium on Windows, with classic
+  # scrollbars that take up space
+  platforms:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-latest
+            browser: webkit
+          - os: windows-latest
+            browser: chromium
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/setup
+      - run: npx playwright install ${{ matrix.browser }}
+      - run: npm run test:browser -- --project ${{ matrix.browser }}
