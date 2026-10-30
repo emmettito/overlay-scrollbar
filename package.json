@@ -1,9 +1,12 @@
 {
   "name": "@emmettito/overlay-scrollbar",
-  "version": "0.0.0",
-  "private": true,
+  "version": "0.1.0",
   "description": "Overlay scrollbars for any scrollable element, in plain TypeScript with no dependencies",
   "license": "MIT",
+  "homepage": "https://emmettito.github.io/overlay-scrollbar/",
+  "bugs": {
+    "url": "https://github.com/emmettito/overlay-scrollbar/issues"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/emmettito/overlay-scrollbar.git"
@@ -11,7 +14,6 @@
   "keywords": [
     "scrollbar",
     "overlay scrollbar",
-    "macos",
     "scroll"
   ],
   "type": "module",
@@ -30,6 +32,9 @@
   "sideEffects": [
     "*.css"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "engines": {
     "node": ">=22.18"
   },
@@ -39,6 +44,7 @@
     "build:lib": "node scripts/build-lib.mts",
     "prepack": "node scripts/refuse-root-pack.mts",
     "package": "node scripts/pack.mts",
+    "release": "node scripts/publish-package.mts",
     "dev": "vite",
     "prebuild": "npm run frameworks",
     "typecheck": "tsc -p tsconfig.app.json && tsc -p tsconfig.lib.json --noEmit && tsc -p tsconfig.node.json && tsc -p tsconfig.spec.json && ngc -p frameworks/angular/tsconfig.app.json --noEmit && ngc -p frameworks/angular/tsconfig.spec.json --noEmit && tsc -p frameworks/react/tsconfig.json && vue-tsc -p frameworks/vue/tsconfig.json && svelte-check --workspace frameworks/svelte --tsconfig ./tsconfig.json",
