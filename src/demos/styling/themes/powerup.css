@@ -1,0 +1,75 @@
+/* Power-up: question blocks on a plain dark track */
+
+/* Every effect is drawn on the thumb's ::before and ::after, which fill it */
+.theme-powerup + .overlay-scrollbar-frame .overlay-scrollbar-thumb::before,
+.theme-powerup + .overlay-scrollbar-frame .overlay-scrollbar-thumb::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+.theme-powerup {
+  --overlay-scrollbar-width: 16px;
+  --overlay-scrollbar-expanded-width: 22px;
+  --overlay-scrollbar-inset: 4px;
+  --overlay-scrollbar-radius: 0;
+  --overlay-scrollbar-expand-duration: 0s; /* Pixel art snaps */
+  background: #5c94fc linear-gradient(transparent calc(100% - 24px), #c84c0c calc(100% - 24px));
+  color: #fff;
+  font:
+    9px/1.6 'Press Start 2P',
+    monospace;
+  text-shadow: 2px 2px 0 #000;
+  image-rendering: pixelated;
+}
+.theme-powerup p:nth-child(odd) {
+  color: #fce4a0;
+}
+/* A plain dark track with a pixel outline */
+.theme-powerup + .overlay-scrollbar-frame .overlay-scrollbar-bar::before {
+  background: rgb(0 0 0 / 0.22);
+  box-shadow: 0 0 0 2px #000;
+}
+/* A question block, rivets in the corners */
+.theme-powerup + .overlay-scrollbar-frame .overlay-scrollbar-thumb,
+.theme-powerup + .overlay-scrollbar-frame .overlay-scrollbar-thumb:hover {
+  background:
+    linear-gradient(#000 0 0) left 3px top 3px / 2px 2px no-repeat,
+    linear-gradient(#000 0 0) right 3px top 3px / 2px 2px no-repeat,
+    linear-gradient(#000 0 0) left 3px bottom 3px / 2px 2px no-repeat,
+    linear-gradient(#000 0 0) right 3px bottom 3px / 2px 2px no-repeat,
+    #f8b800;
+  box-shadow:
+    inset 2px 2px 0 #fce4a0,
+    inset -2px -2px 0 #c84c0c,
+    0 0 0 2px #000;
+  cursor: pointer;
+}
+.theme-powerup + .overlay-scrollbar-frame .overlay-scrollbar-thumb:hover {
+  background-color: #ffd040;
+}
+.theme-powerup + .overlay-scrollbar-frame .overlay-scrollbar-thumb::after {
+  content: '?';
+  display: grid;
+  place-items: center;
+  font:
+    10px 'Press Start 2P',
+    monospace;
+  color: #c84c0c;
+  text-shadow: 1px 1px 0 #000;
+  animation: powerup-blink 1s steps(1) infinite;
+}
+@keyframes powerup-blink {
+  50% {
+    color: #fce4a0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .theme-powerup + .overlay-scrollbar-frame .overlay-scrollbar-thumb::before,
+  .theme-powerup + .overlay-scrollbar-frame .overlay-scrollbar-thumb::after {
+    animation: none;
+  }
+}

@@ -21,7 +21,7 @@ const routes = {
   rtl: 2,
   virtual: 1,
   'drag-drop': 2,
-  styling: 9,
+  styling: 13,
   // The framework demos' bars are in their iframes, checked below
   angular: 0,
   react: 0,
