@@ -1,0 +1,5 @@
+// The editor's entry point: it finds each file's settings through these (Node's for the configs)
+{
+  "files": [],
+  "references": [{ "path": "./tsconfig.node.json" }]
+}

@@ -1,0 +1,19 @@
+// The ESLint config, which runs in Node rather than the browser
+{
+  "compilerOptions": {
+    "target": "ES2023",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "lib": ["ES2023"],
+    "types": ["node"],
+    "skipLibCheck": true,
+    "noEmit": true,
+    "strict": true,
+    // The scripts and the benchmark are TypeScript that Node runs as it is, stripping the types: so they import each
+    // other by their .mts names, and use only syntax that strips away (no enums, namespaces or parameter properties)
+    "allowImportingTsExtensions": true,
+    "erasableSyntaxOnly": true,
+    "verbatimModuleSyntax": true
+  },
+  "include": ["eslint.config.mts"]
+}
