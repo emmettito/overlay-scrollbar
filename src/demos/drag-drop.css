@@ -2,8 +2,10 @@
   display: flex;
   gap: 12px;
 }
+/* The two lists share the side's width */
 .drag-drop .column {
-  width: 220px;
+  flex: 1 1 0;
+  min-width: 0;
 }
 /* Each list's heading, under the side's label */
 .drag-drop .column h3 {
@@ -33,6 +35,12 @@
   -webkit-user-select: none;
   user-select: none;
   -webkit-touch-callout: none;
+}
+/* The last item's line as a shadow rather than a border: a shadow isn't part of what scrolls, so in a full list it
+   falls outside, under the list's own border, and only shows under a short list */
+.drag-drop .item:last-child {
+  border-bottom: 0;
+  box-shadow: 0 1px var(--border-subtle);
 }
 /* A grip of six small dots. touch-action: none on it alone, so a touch anywhere else on the item still scrolls the
    list. */
@@ -91,15 +99,4 @@
 .drag-drop .dragging .handle {
   cursor: grabbing;
   user-select: none;
-}
-/* On narrow screens (the same breakpoint as styles.css and src/menu.ts), the two lists share the column's width
-   rather than having one each */
-@media (max-width: 720px) {
-  .drag-drop .panels > section {
-    width: 100%;
-  }
-  .drag-drop .column {
-    flex: 1 1 0;
-    min-width: 0;
-  }
 }

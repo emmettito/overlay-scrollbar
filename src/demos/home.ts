@@ -14,9 +14,21 @@ import { attachOverlayScrollbar } from '@emmettito/overlay-scrollbar';
 
 const scrollbar = attachOverlayScrollbar(element);`;
 
-const lines = Array.from({ length: 40 }, (_, i) => `Line ${i + 1}`);
+const rainbow = ['red', 'orange', 'yellow', 'green', 'blue', 'indigo', 'violet'];
+// How long each bar takes to go down and back up, in ms
+const PERIOD = 4000;
 
-/** Why the box below shows native scrollbars, where it does; nothing where it shows the library's bars */
+/**
+ * How far down bar `index` is at `time`, as a fraction of the way: a wave moving along the bars, starting with the ends
+ * at the top and the middle at the bottom. Each bar goes down and back up at a steady speed.
+ */
+function wave(index: number, time: number): number {
+  const phase = (index / 6 + time / PERIOD) % 1;
+  // A little past each end and clamped, so it rests there for a few frames rather than turning between two of them
+  return Math.min(1, Math.max(0, 1.04 * (1 - Math.abs(1 - 2 * phase)) - 0.02));
+}
+
+/** Why the bars below can't show, or show although the library would leave them off; nothing otherwise */
 function notice(): string | undefined {
   if (!supportsAnchorPositioning()) {
     return (
@@ -26,8 +38,8 @@ function notice(): string | undefined {
   }
   if (!drawsOverlayScrollbars()) {
     return (
-      'On a touch-only device the library leaves the native scrollbars alone, so the box below keeps them. The demos ' +
-      'draw the library’s bars anyway, to compare.'
+      'By default, the library leaves the native scrollbars alone on a touch-only device; its force option draws its ' +
+      'bars there too. The bars here and in the demos are forced on, to show them.'
     );
   }
   return undefined;
@@ -45,12 +57,9 @@ export const home: Page = {
         <h1>overlay-scrollbar</h1>
         ${why && html`<p class="notice">${why}</p>`}
 
-        <h2>Try it</h2>
-        <p>
-          Scroll this box. Scrolling is the browser's own; the bars are drawn by the library. By default they're thin,
-          widen when the pointer rests on them, and fade out shortly after scrolling stops.
-        </p>
-        <div class="try">${lines.map(line => html`<p>${line}</p>`)}</div>
+        <div class="rainbow">
+          ${rainbow.map(color => html`<div class="scroller ${color}"><div></div></div>`)}
+        </div>
 
         <h2>Using the library</h2>
         <p>
@@ -64,9 +73,40 @@ export const home: Page = {
     `
     );
 
-    // Not forced on, unlike the demos' library columns, so the box shows what the status line says
     const bars = new Bars();
-    bars.attach(find(main, '.try'), { force: false });
-    return () => bars.destroy();
+    const scrollers = rainbow.map(color => find(main, `.rainbow .${color}`));
+    scrollers.forEach(element => bars.attach(element, { autoHide: false }));
+    // Puts the bar where the wave has it, reaching each end. Far from there (just after a pause), moves `ease` of the
+    // way instead, so it glides back rather than jumping.
+    const place = (element: HTMLElement, index: number, time: number, ease: number): void => {
+      const target = (element.scrollHeight - element.clientHeight) * wave(index, time);
+      const distance = target - element.scrollTop;
+      element.scrollTop = Math.abs(distance) < 4 ? target : element.scrollTop + distance * ease;
+    };
+    scrollers.forEach((element, index) => place(element, index, 0, 1));
+
+    // The wave stops while the pointer is on the bars, so they can be scrolled and dragged
+    let frame = 0;
+    if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      const box = find(main, '.rainbow');
+      let paused = false;
+      box.addEventListener('pointerenter', () => (paused = true));
+      box.addEventListener('pointerleave', () => (paused = false));
+      let time = 0;
+      let last = performance.now();
+      const step = (now: number): void => {
+        if (!paused) {
+          time += now - last;
+          scrollers.forEach((element, index) => place(element, index, time, 0.15));
+        }
+        last = now;
+        frame = requestAnimationFrame(step);
+      };
+      frame = requestAnimationFrame(step);
+    }
+    return () => {
+      cancelAnimationFrame(frame);
+      bars.destroy();
+    };
   }
 };

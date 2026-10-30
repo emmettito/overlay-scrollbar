@@ -28,6 +28,10 @@
   padding: 6px 10px;
   border-bottom: 1px solid var(--border-subtle);
 }
+/* No line under the last row, where the box's border already is */
+:where(.examples .box.lines p:last-child) {
+  border-bottom: 0;
+}
 .examples .code {
   margin-top: 10px;
 }

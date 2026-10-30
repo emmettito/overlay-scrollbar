@@ -21,18 +21,59 @@
   border-radius: 6px;
   color: var(--text-muted);
 }
-.docs .try {
-  height: 220px;
-  overflow: auto;
-  margin: 0 0 12px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 8px;
+/* Seven bars, always showing, track and all, each on an element with nothing in it but the room to scroll */
+.rainbow {
+  --red: red;
+  --orange: orange;
+  --yellow: yellow;
+  --green: green;
+  --blue: blue;
+  --indigo: indigo;
+  --violet: violet;
+  --overlay-scrollbar-width: 16px;
+  --overlay-scrollbar-expanded-width: 16px;
+  --overlay-scrollbar-inset: 0px;
+  --overlay-scrollbar-track-color: var(--border-strong);
+  display: flex;
+  /* Only as wide as the bars, so the wave pauses only with the pointer on them (home.ts) */
+  width: fit-content;
+  gap: 40px;
+  margin: 28px 0 32px;
 }
-.docs .try p {
-  margin: 0;
-  padding: 6px 12px;
-  border-bottom: 1px solid var(--border-subtle);
+.rainbow .scroller {
+  width: 16px;
+  height: 240px;
+  overflow: auto;
+  /* The same colour under the pointer */
+  --overlay-scrollbar-thumb-hover-color: var(--overlay-scrollbar-thumb-color);
+}
+/* Content 1.6 times as tall, so each thumb is most of its track */
+.rainbow .scroller > div {
+  height: 160%;
+}
+.rainbow .overlay-scrollbar-bar::before {
+  background-color: var(--overlay-scrollbar-track-color);
+}
+.rainbow .red {
+  --overlay-scrollbar-thumb-color: var(--red);
+}
+.rainbow .orange {
+  --overlay-scrollbar-thumb-color: var(--orange);
+}
+.rainbow .yellow {
+  --overlay-scrollbar-thumb-color: var(--yellow);
+}
+.rainbow .green {
+  --overlay-scrollbar-thumb-color: var(--green);
+}
+.rainbow .blue {
+  --overlay-scrollbar-thumb-color: var(--blue);
+}
+.rainbow .indigo {
+  --overlay-scrollbar-thumb-color: var(--indigo);
+}
+.rainbow .violet {
+  --overlay-scrollbar-thumb-color: var(--violet);
 }
 .docs pre {
   margin: 0 0 12px;
