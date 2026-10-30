@@ -1,26 +1,9 @@
-// The library's specs: strict settings under a bundler's module rules, plus Vite's client types (for the stylesheet
-// import) and vitest's globals (describe, it, vi)
+// The library's and the app's specs: the app's settings, plus vitest's globals (describe, it, vi)
 {
+  "extends": "./tsconfig.app.json",
   "compilerOptions": {
-    "target": "ES2022",
-    "useDefineForClassFields": true,
-    "module": "ESNext",
-    "lib": ["ES2022", "DOM", "DOM.Iterable"],
-    "types": ["vite/client", "vitest/globals"],
-    "skipLibCheck": true,
-
-    /* Bundler mode */
-    "moduleResolution": "bundler",
-    "isolatedModules": true,
-    "moduleDetection": "force",
-    "noEmit": true,
-
-    /* Linting */
-    "strict": true,
-    "noImplicitOverride": true,
-    "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true,
-    "noPropertyAccessFromIndexSignature": true
+    "types": ["vite/client", "vitest/globals"]
   },
-  "include": ["src/**/*.spec.ts", "src/overlay-scrollbar/vitest-setup.ts"]
+  "include": ["src/**/*.spec.ts", "src/overlay-scrollbar/vitest-setup.ts"],
+  "exclude": []
 }

@@ -1,0 +1,104 @@
+.drag-drop .board {
+  display: flex;
+  gap: 12px;
+}
+.drag-drop .column {
+  width: 220px;
+}
+/* Each list's heading, under the side's label */
+.drag-drop .column h3 {
+  margin: 0 0 6px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text);
+}
+.drag-drop .count {
+  font-weight: normal;
+}
+.drag-drop .list {
+  height: 360px;
+  overflow: auto;
+  background: var(--surface-muted);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+.drag-drop .item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 10px 7px 4px;
+  border-bottom: 1px solid var(--border-subtle);
+  background: var(--surface);
+  /* A long press picks the item up, rather than selecting its text or opening a callout */
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+/* A grip of six small dots. touch-action: none on it alone, so a touch anywhere else on the item still scrolls the
+   list. */
+.drag-drop .handle {
+  position: relative;
+  flex: none;
+  width: 10px;
+  height: 15px;
+  margin-left: 4px;
+  cursor: grab;
+  touch-action: none;
+  background: radial-gradient(circle, var(--text-faint) 1px, transparent 1.5px) 0 0 / 5px 5px;
+}
+/* With a mouse, the grip shows only on the item under the pointer (and on the copy being dragged); on a touch screen
+   it always shows */
+@media (hover: hover) {
+  .drag-drop .handle {
+    opacity: 0;
+    transition: opacity 0.1s;
+  }
+  .drag-drop .item:hover .handle,
+  .drag-drop .ghost .handle {
+    opacity: 1;
+  }
+}
+/* Easier to hit than it looks: 30 × 34px, out to the item's left edge and into the gap before its text */
+.drag-drop .handle::before {
+  content: '';
+  position: absolute;
+  inset: -8px -6px -8px -10px;
+}
+/* The item itself, left where it would drop */
+.drag-drop .item.placeholder {
+  background: var(--accent-soft);
+  outline: 1px dashed var(--accent);
+  outline-offset: -1px;
+  border-radius: 6px;
+}
+.drag-drop .item.placeholder > * {
+  visibility: hidden;
+}
+/* The copy that follows the pointer: above the bars, whose frames have a z-index of 999 and up */
+.drag-drop .ghost {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 10000;
+  box-sizing: border-box;
+  pointer-events: none;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  box-shadow: 0 6px 16px var(--shadow);
+  opacity: 0.95;
+}
+.drag-drop .dragging,
+.drag-drop .dragging .handle {
+  cursor: grabbing;
+  user-select: none;
+}
+/* On narrow screens, the two lists share the panel's width rather than having one each */
+@media (max-width: 720px) {
+  .drag-drop .panels > section {
+    width: 100%;
+  }
+  .drag-drop .column {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+}

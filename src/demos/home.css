@@ -1,0 +1,50 @@
+.docs {
+  max-width: 860px;
+  line-height: 1.55;
+}
+.docs h1 {
+  font-size: 26px;
+}
+.docs h2 {
+  font-size: 17px;
+  margin: 28px 0 8px;
+}
+.docs p,
+.docs ul {
+  margin: 0 0 12px;
+}
+/* Shown only where the library keeps the native scrollbars, saying why */
+.docs .notice {
+  padding: 8px 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text-muted);
+}
+.docs .try {
+  height: 220px;
+  overflow: auto;
+  margin: 0 0 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+.docs .try p {
+  margin: 0;
+  padding: 6px 12px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+.docs pre {
+  margin: 0 0 12px;
+  padding: 12px 14px;
+  overflow: auto;
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+.docs code {
+  font:
+    12px/1.5 'Geist Mono Variable',
+    ui-monospace,
+    monospace;
+}

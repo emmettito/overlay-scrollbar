@@ -1,0 +1,12 @@
+.rtl .box {
+  width: 340px;
+  overflow: auto;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+.rtl .box p {
+  margin: 0;
+  padding: 6px 12px;
+  border-bottom: 1px solid var(--border-subtle);
+}

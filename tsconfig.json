@@ -1,9 +1,9 @@
-// The editor's entry point: it finds each file's settings through these (the library's, the specs' with test globals,
-// or Node's for the configs and scripts)
+// The editor's entry point: it finds each file's settings through these (the app's, the specs' with test globals, or
+// Node's for the configs and scripts)
 {
   "files": [],
   "references": [
-    { "path": "./tsconfig.lib.json" },
+    { "path": "./tsconfig.app.json" },
     { "path": "./tsconfig.spec.json" },
     { "path": "./tsconfig.node.json" }
   ]

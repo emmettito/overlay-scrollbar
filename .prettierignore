@@ -2,6 +2,7 @@
 
 *.md
 
+/dist
 /lib
 
 /node_modules
