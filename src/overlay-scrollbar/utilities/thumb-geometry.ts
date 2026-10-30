@@ -8,8 +8,8 @@ export interface ThumbSize {
 }
 
 /**
- * Sizes a thumb like AppKit's knob: the track times the visible part of the content, at least `minLength`, but never
- * longer than the track (a track shorter than `minLength` is filled by the thumb).
+ * Sizes a thumb: the track times the visible part of the content, at least `minLength`, but never longer than the
+ * track (a track shorter than `minLength` is filled by the thumb).
  */
 export function measureThumb(track: number, visible: number, total: number, minLength = MIN_THUMB_LENGTH): ThumbSize {
   const length = Math.min(track, Math.max(minLength, (track * visible) / total));

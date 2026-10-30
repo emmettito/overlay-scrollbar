@@ -1,4 +1,4 @@
-// Defaults for OverlayScrollbarOptions. Timings in ms, from screen recordings of Safari on macOS.
+// Defaults for OverlayScrollbarOptions. Timings in ms.
 
 // The pointer has to stay on the bar this long before it shows and expands, so passing over it does nothing:
 // 50-100ms after the pointer reaches the bar, never while it's swept across.
@@ -7,7 +7,7 @@ export const HOVER_DELAY = 80;
 export const HIDE_AFTER_SCROLL = 700;
 export const HIDE_AFTER_LEAVE = 500;
 
-// Shortest thumb, in px. Not measured from AppKit: perfect-scrollbar's default minScrollbarLength.
+// Shortest thumb, in px
 export const MIN_THUMB_LENGTH = 20;
-// AppKit's page scroll keeps this much of the previous page in view, in px
+// A page scroll keeps this much of the previous page in view, in px
 export const PAGE_OVERLAP = 10;

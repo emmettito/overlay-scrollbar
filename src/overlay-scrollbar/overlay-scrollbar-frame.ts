@@ -271,8 +271,8 @@ export function drawOverlayScrollbarFrame(
       setCustomProperty('--_overlay-scrollbar-border-top', `${borderTop}px`);
       setCustomProperty('--_overlay-scrollbar-border-left', `${borderLeft}px`);
     },
-    // The stylesheet sets the track lengths from the inset and the corner gap, so they're measured. By default, like
-    // AppKit's, both bars run to the corner and overlap there; with autoHide off they leave room for each other.
+    // The stylesheet sets the track lengths from the inset and the corner gap, so they're measured. By default, both
+    // bars run to the corner and overlap there; with autoHide off they leave room for each other.
     readTracks(): void {
       if (destroyed) {
         return;
