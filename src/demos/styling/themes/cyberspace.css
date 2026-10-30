@@ -11,9 +11,9 @@
 }
 
 .theme-cyberspace {
-  --overlay-scrollbar-width: 6px;
-  --overlay-scrollbar-expanded-width: 12px;
-  --overlay-scrollbar-inset: 5px;
+  --osb-width: 6px;
+  --osb-expanded-width: 12px;
+  --osb-inset: 5px;
   background:
     linear-gradient(transparent 60%, rgb(255 42 109 / 0.15)),
     repeating-linear-gradient(90deg, rgb(5 217 232 / 0.12) 0 1px, transparent 1px 32px),

@@ -11,11 +11,11 @@
 }
 
 .theme-retro {
-  --overlay-scrollbar-width: 16px;
-  --overlay-scrollbar-expanded-width: 22px;
-  --overlay-scrollbar-inset: 4px;
-  --overlay-scrollbar-radius: 0;
-  --overlay-scrollbar-expand-duration: 0s; /* Pixel art snaps */
+  --osb-width: 16px;
+  --osb-expanded-width: 22px;
+  --osb-inset: 4px;
+  --osb-radius: 0;
+  --osb-expand-duration: 0s; /* Pixel art snaps */
   background: #5c94fc linear-gradient(transparent calc(100% - 24px), #c84c0c calc(100% - 24px));
   color: #fff;
   font:

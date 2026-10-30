@@ -32,9 +32,9 @@
    right after the list, rather than on the root: the bars take the list's colours when they're attached, and the
    wrappers don't call update() when the theme changes, so colours the list has would stay as they were. */
 :root[data-theme='dark'] .list + * {
-  --overlay-scrollbar-thumb-color: rgb(255 255 255 / 0.4);
-  --overlay-scrollbar-thumb-hover-color: rgb(255 255 255 / 0.55);
-  --overlay-scrollbar-track-color: rgb(255 255 255 / 0.06);
+  --osb-thumb-color: rgb(255 255 255 / 0.4);
+  --osb-thumb-hover-color: rgb(255 255 255 / 0.55);
+  --osb-track-color: rgb(255 255 255 / 0.06);
 }
 .demo {
   font:

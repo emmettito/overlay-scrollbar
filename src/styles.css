@@ -43,9 +43,9 @@
   --shadow: rgb(0 0 0 / 0.5);
   --backdrop: rgb(0 0 0 / 0.55);
   /* The library's bars default to dark thumbs: light ones here, so they show on the dark surfaces */
-  --overlay-scrollbar-thumb-color: rgb(255 255 255 / 0.4);
-  --overlay-scrollbar-thumb-hover-color: rgb(255 255 255 / 0.55);
-  --overlay-scrollbar-track-color: rgb(255 255 255 / 0.06);
+  --osb-thumb-color: rgb(255 255 255 / 0.4);
+  --osb-thumb-hover-color: rgb(255 255 255 / 0.55);
+  --osb-track-color: rgb(255 255 255 / 0.06);
 }
 
 body {

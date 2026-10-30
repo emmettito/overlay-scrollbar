@@ -226,7 +226,7 @@ describe('overlay scrollbars in a real browser', () => {
   });
 
   it('takes its sizes from the custom properties', async () => {
-    const host = attach(tall, '--overlay-scrollbar-width: 10px; --overlay-scrollbar-inset: 8px');
+    const host = attach(tall, '--osb-width: 10px; --osb-inset: 8px');
     await frames();
     const box = host.getBoundingClientRect();
     expect(rect(host, '.overlay-scrollbar-bar-y .overlay-scrollbar-thumb').width).toBe(10);
@@ -236,7 +236,7 @@ describe('overlay scrollbars in a real browser', () => {
   it('takes the custom properties from a class on the element, though the frame is outside it', async () => {
     const style = document.createElement('style');
     style.dataset['test'] = '';
-    style.textContent = '.wide-thumbs { --overlay-scrollbar-width: 9px; }';
+    style.textContent = '.wide-thumbs { --osb-width: 9px; }';
     document.head.appendChild(style);
     const host = attach(tall);
     host.classList.add('wide-thumbs');
@@ -263,7 +263,7 @@ describe('overlay scrollbars in a real browser', () => {
   it("adds to the element's own anchor names, and leaves them when destroyed", async () => {
     const host = attach(tall, 'anchor-name: --page-anchor');
     await frames();
-    expect(host.style.getPropertyValue('anchor-name')).toMatch(/^--page-anchor, --overlay-scrollbar-frame-\d+$/);
+    expect(host.style.getPropertyValue('anchor-name')).toMatch(/^--page-anchor, --osb-\d+$/);
     refs.splice(0).forEach(ref => ref.destroy());
     expect(host.style.getPropertyValue('anchor-name')).toBe('--page-anchor');
   });
@@ -304,7 +304,7 @@ describe('overlay scrollbars in a real browser', () => {
     await frames();
     if (thumbsUseScrollTimeline()) {
       // The stylesheet's name is kept alongside the bars' own while they're attached
-      expect(parent.style.getPropertyValue('timeline-scope')).toMatch(/^--page-timeline, --overlay-scrollbar-/);
+      expect(parent.style.getPropertyValue('timeline-scope')).toMatch(/^--page-timeline, --osb-/);
     }
     ref.destroy();
     expect(parent.style.getPropertyValue('timeline-scope')).toBe('');

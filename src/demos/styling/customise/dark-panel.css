@@ -2,9 +2,9 @@
 .dark-panel {
   background: #1e1e1e;
   color: #eee;
-  --overlay-scrollbar-thumb-color: rgb(255 255 255 / 0.5);
-  --overlay-scrollbar-thumb-hover-color: rgb(255 255 255 / 0.6);
-  --overlay-scrollbar-track-color: rgb(255 255 255 / 0.1);
+  --osb-thumb-color: rgb(255 255 255 / 0.5);
+  --osb-thumb-hover-color: rgb(255 255 255 / 0.6);
+  --osb-track-color: rgb(255 255 255 / 0.1);
 }
 .dark-panel p {
   border-color: #333;

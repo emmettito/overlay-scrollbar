@@ -6,7 +6,7 @@
    scrolling and fills the track when the pointer is on the bar, with its outer edge fixed so it grows inwards. Shown
    instantly, faded out as a whole. Black at 50% for the thumb (60% under the pointer) and 4.7% for the track.
 
-   The --overlay-scrollbar-* custom properties theme it (listed in README.md). The --_overlay-scrollbar-* ones, with
+   The --osb-* custom properties theme it (listed in README.md). The --_osb-* ones, with
    the leading underscore, are internal: they're set on the frame, by overlay-scrollbar-frame.ts or below, so they
    never reach the element's content or a nested scroller. */
 
@@ -32,21 +32,21 @@
      them. Hidden while the element is out of sight. Contained, so moving and resizing the thumbs never lays out the
      scrolling element: Safari clamps a keyboard scroll back into range whenever it does, which kills the rubber-band. */
   .overlay-scrollbar-frame {
-    --_overlay-scrollbar-width: var(--overlay-scrollbar-width, 6px);
-    --_overlay-scrollbar-expanded-width: var(--overlay-scrollbar-expanded-width, 11px);
-    --_overlay-scrollbar-inset: var(--overlay-scrollbar-inset, 3px);
-    --_overlay-scrollbar-radius: var(--overlay-scrollbar-radius, var(--_overlay-scrollbar-expanded-width));
-    --_overlay-scrollbar-expand: var(--overlay-scrollbar-expand-duration, 0.15s) ease-out;
-    --_overlay-scrollbar-corner: var(--overlay-scrollbar-corner, 0px);
+    --_osb-width: var(--osb-width, 6px);
+    --_osb-expanded-width: var(--osb-expanded-width, 11px);
+    --_osb-inset: var(--osb-inset, 3px);
+    --_osb-radius: var(--osb-radius, var(--_osb-expanded-width));
+    --_osb-expand: var(--osb-expand-duration, 0.15s) ease-out;
+    --_osb-corner: var(--osb-corner, 0px);
     position: absolute;
-    top: calc(anchor(top) + var(--_overlay-scrollbar-border-top, 0px));
-    left: calc(anchor(left) + var(--_overlay-scrollbar-border-left, 0px));
-    width: var(--_overlay-scrollbar-client-width);
-    height: var(--_overlay-scrollbar-client-height);
+    top: calc(anchor(top) + var(--_osb-border-top, 0px));
+    left: calc(anchor(left) + var(--_osb-border-left, 0px));
+    width: var(--_osb-client-width);
+    height: var(--_osb-client-height);
     position-visibility: anchors-visible;
-    /* Above the page's own content; --_overlay-scrollbar-depth is how many attached elements this one is nested in, so
+    /* Above the page's own content; --_osb-depth is how many attached elements this one is nested in, so
        nested bars go above their parents'. A known limit: it's also above overlays with a lower z-index (README.md). */
-    z-index: calc(999 + var(--_overlay-scrollbar-depth, 0));
+    z-index: calc(999 + var(--_osb-depth, 0));
     contain: strict;
     pointer-events: none;
     /* Dragging a thumb mustn't start a text selection (iPadOS does with its pointer) or a touch callout */
@@ -63,17 +63,14 @@
     touch-action: none;
     /* The arrow, as over native scrollbars, rather than whatever the element uses (e.g. a code editor's I-beam) */
     cursor: default;
-    /* Hidden, or with --overlay-scrollbar-idle-opacity, faintly showing while not in use */
-    opacity: var(--overlay-scrollbar-idle-opacity, 0);
-    transition: opacity var(--overlay-scrollbar-fade-duration, 0.25s) linear;
+    /* Hidden, or with --osb-idle-opacity, faintly showing while not in use */
+    opacity: var(--osb-idle-opacity, 0);
+    transition: opacity var(--osb-fade-duration, 0.25s) linear;
   }
 
   /* Bars that stay showing leave room for each other in the corner, like classic scrollbars */
   .overlay-scrollbar-always {
-    --_overlay-scrollbar-corner: var(
-      --overlay-scrollbar-corner,
-      calc(var(--_overlay-scrollbar-expanded-width) + var(--_overlay-scrollbar-inset))
-    );
+    --_osb-corner: var(--osb-corner, calc(var(--_osb-expanded-width) + var(--_osb-inset)));
   }
 
   /* Where both show and overlap in the corner, the bar in use goes on top */
@@ -93,97 +90,97 @@
 
   /* Shown by the pointer coming onto the element (autoHide 'leave'), rather than by scrolling or hovering a bar */
   .overlay-scrollbar-visible.overlay-scrollbar-fade-in {
-    transition: opacity var(--overlay-scrollbar-fade-in-duration, 0.2s) linear;
+    transition: opacity var(--osb-fade-in-duration, 0.2s) linear;
   }
 
   /* The track: only coloured while expanded */
   .overlay-scrollbar-bar::before {
     content: '';
     position: absolute;
-    border-radius: var(--_overlay-scrollbar-radius);
+    border-radius: var(--_osb-radius);
   }
 
   .overlay-scrollbar-expanded::before {
-    background-color: var(--overlay-scrollbar-track-color, rgb(0 0 0 / 0.047));
+    background-color: var(--osb-track-color, rgb(0 0 0 / 0.047));
   }
 
   .overlay-scrollbar-thumb {
     position: absolute;
-    border-radius: var(--_overlay-scrollbar-radius);
-    background-color: var(--overlay-scrollbar-thumb-color, rgb(0 0 0 / 0.5));
+    border-radius: var(--_osb-radius);
+    background-color: var(--osb-thumb-color, rgb(0 0 0 / 0.5));
   }
 
   .overlay-scrollbar-thumb:hover,
   .overlay-scrollbar-dragging > .overlay-scrollbar-thumb {
-    background-color: var(--overlay-scrollbar-thumb-hover-color, rgb(0 0 0 / 0.6));
+    background-color: var(--osb-thumb-hover-color, rgb(0 0 0 / 0.6));
   }
 
   .overlay-scrollbar-bar-y {
-    top: var(--_overlay-scrollbar-inset);
-    bottom: var(--_overlay-scrollbar-inset);
+    top: var(--_osb-inset);
+    bottom: var(--_osb-inset);
     inset-inline-end: 0;
-    width: calc(var(--_overlay-scrollbar-expanded-width) + var(--_overlay-scrollbar-inset));
+    width: calc(var(--_osb-expanded-width) + var(--_osb-inset));
   }
 
   .overlay-scrollbar-both > .overlay-scrollbar-bar-y {
-    bottom: calc(var(--_overlay-scrollbar-inset) + var(--_overlay-scrollbar-corner));
+    bottom: calc(var(--_osb-inset) + var(--_osb-corner));
   }
 
   /* The track grows with the thumb, from the same fixed outer edge */
   .overlay-scrollbar-bar-y::before {
     inset-block: 0;
-    inset-inline-end: var(--_overlay-scrollbar-inset);
-    width: var(--_overlay-scrollbar-width);
-    transition: width var(--_overlay-scrollbar-expand);
+    inset-inline-end: var(--_osb-inset);
+    width: var(--_osb-width);
+    transition: width var(--_osb-expand);
   }
 
   .overlay-scrollbar-bar-y.overlay-scrollbar-expanded::before {
-    width: var(--_overlay-scrollbar-expanded-width);
+    width: var(--_osb-expanded-width);
   }
 
   .overlay-scrollbar-bar-y > .overlay-scrollbar-thumb {
     top: 0;
-    inset-inline-end: var(--_overlay-scrollbar-inset);
-    width: var(--_overlay-scrollbar-width);
-    height: var(--_overlay-scrollbar-thumb-y);
-    transition: width var(--_overlay-scrollbar-expand);
+    inset-inline-end: var(--_osb-inset);
+    width: var(--_osb-width);
+    height: var(--_osb-thumb-y);
+    transition: width var(--_osb-expand);
   }
 
   .overlay-scrollbar-bar-y.overlay-scrollbar-expanded > .overlay-scrollbar-thumb {
-    width: var(--_overlay-scrollbar-expanded-width);
+    width: var(--_osb-expanded-width);
   }
 
   .overlay-scrollbar-bar-x {
     bottom: 0;
-    inset-inline: var(--_overlay-scrollbar-inset);
-    height: calc(var(--_overlay-scrollbar-expanded-width) + var(--_overlay-scrollbar-inset));
+    inset-inline: var(--_osb-inset);
+    height: calc(var(--_osb-expanded-width) + var(--_osb-inset));
   }
 
   .overlay-scrollbar-both > .overlay-scrollbar-bar-x {
-    inset-inline-end: calc(var(--_overlay-scrollbar-inset) + var(--_overlay-scrollbar-corner));
+    inset-inline-end: calc(var(--_osb-inset) + var(--_osb-corner));
   }
 
   .overlay-scrollbar-bar-x::before {
     inset-inline: 0;
-    bottom: var(--_overlay-scrollbar-inset);
-    height: var(--_overlay-scrollbar-width);
-    transition: height var(--_overlay-scrollbar-expand);
+    bottom: var(--_osb-inset);
+    height: var(--_osb-width);
+    transition: height var(--_osb-expand);
   }
 
   .overlay-scrollbar-bar-x.overlay-scrollbar-expanded::before {
-    height: var(--_overlay-scrollbar-expanded-width);
+    height: var(--_osb-expanded-width);
   }
 
   .overlay-scrollbar-bar-x > .overlay-scrollbar-thumb {
-    bottom: var(--_overlay-scrollbar-inset);
+    bottom: var(--_osb-inset);
     inset-inline-start: 0;
-    width: var(--_overlay-scrollbar-thumb-x);
-    height: var(--_overlay-scrollbar-width);
-    transition: height var(--_overlay-scrollbar-expand);
+    width: var(--_osb-thumb-x);
+    height: var(--_osb-width);
+    transition: height var(--_osb-expand);
   }
 
   .overlay-scrollbar-bar-x.overlay-scrollbar-expanded > .overlay-scrollbar-thumb {
-    height: var(--_overlay-scrollbar-expanded-width);
+    height: var(--_osb-expanded-width);
   }
 
   /* Windows High Contrast (forced colours) replaces the translucent colours with the page background, which would leave
@@ -220,12 +217,12 @@
      moves them */
   .overlay-scrollbar-scroll-timeline > .overlay-scrollbar-bar-x > .overlay-scrollbar-thumb {
     animation: overlay-scrollbar-thumb-x linear both;
-    animation-timeline: var(--_overlay-scrollbar-timeline-x);
+    animation-timeline: var(--_osb-timeline-x);
   }
 
   .overlay-scrollbar-scroll-timeline > .overlay-scrollbar-bar-y > .overlay-scrollbar-thumb {
     animation: overlay-scrollbar-thumb-y linear both;
-    animation-timeline: var(--_overlay-scrollbar-timeline-y);
+    animation-timeline: var(--_osb-timeline-y);
   }
 
   @keyframes overlay-scrollbar-thumb-x {
@@ -233,7 +230,7 @@
       translate: 0 0;
     }
     to {
-      translate: var(--_overlay-scrollbar-travel-x) 0;
+      translate: var(--_osb-travel-x) 0;
     }
   }
 
@@ -242,7 +239,7 @@
       translate: 0 0;
     }
     to {
-      translate: 0 var(--_overlay-scrollbar-travel-y);
+      translate: 0 var(--_osb-travel-y);
     }
   }
 }

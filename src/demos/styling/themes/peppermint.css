@@ -11,9 +11,9 @@
 }
 
 .theme-peppermint {
-  --overlay-scrollbar-width: 12px;
-  --overlay-scrollbar-expanded-width: 18px;
-  --overlay-scrollbar-inset: 4px;
+  --osb-width: 12px;
+  --osb-expanded-width: 18px;
+  --osb-inset: 4px;
   background: #fff7fb;
   color: #c2185b;
   font:
