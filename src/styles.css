@@ -363,7 +363,8 @@ main {
   display: none;
 }
 /* On narrow screens, a bar across the top whose menu button slides the nav out over the page (src/menu.ts). The bars'
-   frames have a z-index of 999 and up, so these sit above them. */
+   frames have a z-index of 999 and up, so these sit above them. The breakpoint is also in src/menu.ts and the demos'
+   stylesheets: change them together. */
 @media (max-width: 720px) {
   body {
     display: block;

@@ -47,7 +47,7 @@ export const nested: Page = {
         </p>
         <div class="controls">
           <label>
-            Inner box padding
+            Inner box margin
             <input type="range" min="0" max="32" value="0" />
             <span data-pad>0px</span>
           </label>

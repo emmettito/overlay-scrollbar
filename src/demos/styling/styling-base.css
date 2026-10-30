@@ -79,7 +79,10 @@
   max-height: 320px;
 }
 .examples .code pre code {
+  /* As wide as the longest line, so the gutter below stays put all the way along it */
   display: block;
+  width: max-content;
+  min-width: 100%;
   counter-reset: line;
   font:
     12px/1.5 'Geist Mono Variable',

@@ -37,12 +37,13 @@ function notice(): string | undefined {
 export const home: Page = {
   title: 'overlay-scrollbar',
   render(main) {
+    const why = notice();
     render(
       main,
       html`
       <article class="docs">
         <h1>overlay-scrollbar</h1>
-        ${notice() && html`<p class="notice">${notice()}</p>`}
+        ${why && html`<p class="notice">${why}</p>`}
 
         <h2>Try it</h2>
         <p>

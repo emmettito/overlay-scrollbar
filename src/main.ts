@@ -1,6 +1,6 @@
 // organize-imports-ignore: the order below matters, and Prettier's organize-imports plugin would sort it.
 // The library's stylesheet goes first: its rules sit in a cascade layer, and the layer declared first loses to every
-// other, including those the pages' own stylesheets declare (the Styling page's layered override).
+// other, including any the pages' own stylesheets declare.
 import './overlay-scrollbar/overlay-scrollbar.css';
 // The app's fonts, bundled into the build rather than loaded from elsewhere
 import '@fontsource-variable/geist-mono';
@@ -53,6 +53,6 @@ function show(): void {
 }
 
 themeToggle(find<HTMLButtonElement>(document, '.theme-toggle'));
-navMenu(find<HTMLButtonElement>(document, '.menu-button'), find(document, '.nav-backdrop'));
+navMenu(find<HTMLButtonElement>(document, '.menu-button'), find(document, '.nav-backdrop'), main);
 addEventListener('hashchange', show);
 show();

@@ -92,7 +92,8 @@
   cursor: grabbing;
   user-select: none;
 }
-/* On narrow screens, the two lists share the panel's width rather than having one each */
+/* On narrow screens (the same breakpoint as styles.css and src/menu.ts), the two lists share the column's width
+   rather than having one each */
 @media (max-width: 720px) {
   .drag-drop .panels > section {
     width: 100%;

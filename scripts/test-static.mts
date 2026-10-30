@@ -129,6 +129,40 @@ for (const [name, type, env] of browsers) {
     }
   }
 
+  // On a phone-sized screen (a short one, to try the dialog): no page wider than the screen, the menu slides out with
+  // the page behind it inert and a link closes it, and the dialog keeps its Done button on screen
+  await tab.setViewportSize({ width: 390, height: 600 });
+  for (const route of Object.keys(routes)) {
+    await tab.goto(`${page}#/${route}`);
+    await tab.waitForTimeout(200);
+    const width = await tab.evaluate(() => document.documentElement.scrollWidth);
+    if (width > 390) {
+      fail(`#/${route} is ${width}px wide on a 390px screen`);
+    }
+  }
+  await tab.goto(`${page}#/list`);
+  await tab.click('.menu-button');
+  await tab.waitForTimeout(300);
+  if (
+    !(await tab.evaluate(() => document.body.classList.contains('nav-open') && document.querySelector('main')?.inert))
+  ) {
+    fail("the menu didn't open, with the page behind it inert");
+  }
+  await tab.click('nav a[href="#/styling"]');
+  await tab.waitForTimeout(300);
+  if (await tab.evaluate(() => document.body.classList.contains('nav-open') || location.hash !== '#/styling')) {
+    fail("a link in the menu didn't close it and go to its page");
+  }
+  await tab.goto(`${page}#/dialog`);
+  await tab.click('[data-action=open]');
+  await tab.waitForTimeout(300);
+  const done = await tab.locator('dialog [data-action=close]').boundingBox();
+  if (!done || done.y + done.height > 600) {
+    fail("the dialog's Done button is off a phone's screen");
+  }
+  await tab.keyboard.press('Escape');
+  await tab.setViewportSize({ width: 1280, height: 720 });
+
   errors.forEach(error => fail(error));
   await browser.close();
   console.log(`${name}: checked ${Object.keys(routes).length + 2} pages from disk`);
