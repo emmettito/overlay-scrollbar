@@ -1,0 +1,10 @@
+// The demo's specs: the demo's settings, plus vitest's globals (describe, it, vi)
+{
+  "extends": "./tsconfig.app.json",
+  "compilerOptions": {
+    "types": ["vite/client", "vitest/globals"]
+  },
+  "files": ["test-setup.ts"],
+  "include": ["src/**/*.spec.ts"],
+  "exclude": []
+}

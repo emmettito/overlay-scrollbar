@@ -35,11 +35,13 @@
   },
   "scripts": {
     "prepare": "husky",
+    "frameworks": "node scripts/build-frameworks.mts",
     "build:lib": "node scripts/build-lib.mts",
     "prepack": "node scripts/refuse-root-pack.mts",
     "package": "node scripts/pack.mts",
     "dev": "vite",
-    "typecheck": "tsc -p tsconfig.app.json && tsc -p tsconfig.lib.json --noEmit && tsc -p tsconfig.node.json && tsc -p tsconfig.spec.json",
+    "prebuild": "npm run frameworks",
+    "typecheck": "tsc -p tsconfig.app.json && tsc -p tsconfig.lib.json --noEmit && tsc -p tsconfig.node.json && tsc -p tsconfig.spec.json && ngc -p frameworks/angular/tsconfig.app.json --noEmit && ngc -p frameworks/angular/tsconfig.spec.json --noEmit && tsc -p frameworks/react/tsconfig.json && vue-tsc -p frameworks/vue/tsconfig.json && svelte-check --workspace frameworks/svelte --tsconfig ./tsconfig.json",
     "lint": "eslint . --max-warnings=0",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
@@ -61,16 +63,31 @@
     }
   },
   "devDependencies": {
+    "@analogjs/vite-plugin-angular": "^2.9.2",
+    "@angular/build": "^22.2.5",
+    "@angular/common": "^22.2.4",
+    "@angular/compiler": "^22.2.4",
+    "@angular/compiler-cli": "^22.2.4",
+    "@angular/core": "^22.2.4",
+    "@angular/platform-browser": "^22.2.4",
     "@eslint/js": "^10.0.1",
     "@fontsource-variable/geist-mono": "^5.3.0",
     "@fontsource-variable/inter": "^5.3.0",
     "@stylistic/eslint-plugin": "^5.10.0",
+    "@sveltejs/vite-plugin-svelte": "^7.3.1",
     "@types/node": "^24.19.2",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.1.2",
+    "@vitejs/plugin-vue": "^6.0.10",
     "@vitest/browser-playwright": "^5.0.5",
+    "angular-eslint": "^22.6.0",
     "esbuild": "^0.28.2",
     "eslint": "^10.13.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-perfectionist": "^5.13.0",
+    "eslint-plugin-svelte": "^3.23.1",
+    "eslint-plugin-vue": "^10.12.0",
     "globals": "^17.13.0",
     "husky": "^9.1.7",
     "jiti": "^2.7.0",
@@ -79,13 +96,29 @@
     "playwright": "^1.64.1",
     "prettier": "^3.9.10",
     "prettier-plugin-organize-imports": "^4.3.0",
+    "prettier-plugin-svelte": "^4.1.1",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "rxjs": "~7.8.2",
+    "svelte": "^5.57.3",
+    "svelte-check": "^4.7.7",
     "typescript": "~6.0.2",
     "typescript-eslint": "^8.72.1",
     "vite": "^8.3.5",
-    "vitest": "^5.0.5"
+    "vitest": "^5.0.5",
+    "vue": "^3.5.44",
+    "vue-tsc": "^3.3.14"
+  },
+  "overrides": {
+    "@angular/build": {
+      "vite": "$vite"
+    }
   },
   "allowScripts": {
+    "@parcel/watcher": false,
     "esbuild": false,
-    "fsevents": false
+    "fsevents": false,
+    "lmdb": false,
+    "msgpackr-extract": false
   }
 }

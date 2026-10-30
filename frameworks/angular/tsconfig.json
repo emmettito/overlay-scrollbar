@@ -1,0 +1,5 @@
+// The editor's entry point: it finds each file's settings through these (the app's, or the specs' with test globals)
+{
+  "files": [],
+  "references": [{ "path": "./tsconfig.app.json" }, { "path": "./tsconfig.spec.json" }]
+}
