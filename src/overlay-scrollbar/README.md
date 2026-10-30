@@ -6,11 +6,8 @@ The bars show wherever there's a mouse or trackpad. Touch-only devices, and brow
 
 ## Install
 
-The package isn't on npm. Build it from this repository, then install the file it writes:
-
 ```sh
-npm run package
-npm install <path to>/overlay-scrollbar-<version>.tgz
+npm install @emmettito/overlay-scrollbar
 ```
 
 ## Use

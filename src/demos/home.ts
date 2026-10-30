@@ -6,8 +6,7 @@ import { Bars, find, html, Page, render } from './page';
 const repository = 'https://github.com/emmettito/overlay-scrollbar';
 const readme = `${repository}/blob/main/src/overlay-scrollbar/README.md`;
 
-const install = `npm run package
-npm install <path to>/overlay-scrollbar-<version>.tgz`;
+const install = 'npm install @emmettito/overlay-scrollbar';
 
 const use = `import '@emmettito/overlay-scrollbar/overlay-scrollbar.css';
 import { attachOverlayScrollbar } from '@emmettito/overlay-scrollbar';
@@ -62,10 +61,6 @@ export const home: Page = {
         </div>
 
         <h2>Using the library</h2>
-        <p>
-          The package isn't on npm. Build it from <a href="${repository}">this repository</a>, then install the file it
-          writes:
-        </p>
         <pre><code>${install}</code></pre>
         <pre><code>${use}</code></pre>
         <p>Options, theming and limits are in <a href="${readme}">the library's README</a>.</p>
