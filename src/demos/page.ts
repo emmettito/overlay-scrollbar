@@ -75,6 +75,14 @@ export class Bars {
     return ref;
   }
 
+  /**
+   * Attaches the bars to every code block under `root`. Not forced on, unlike the demos' library columns: like the
+   * app's own scrolling, a touch-only device keeps its native scrollbars.
+   */
+  public attachCode(root: HTMLElement): void {
+    root.querySelectorAll<HTMLElement>('pre').forEach(element => this.attach(element, { force: false }));
+  }
+
   /** Attaches the bars to every element under `root` marked `data-lib`, the library's column of a comparison */
   public attachMarked(root: HTMLElement): void {
     root.querySelectorAll<HTMLElement>('[data-lib]').forEach(element => this.attach(element));

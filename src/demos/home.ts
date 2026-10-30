@@ -71,6 +71,7 @@ export const home: Page = {
     const bars = new Bars();
     const scrollers = rainbow.map(color => find(main, `.rainbow .${color}`));
     scrollers.forEach(element => bars.attach(element, { autoHide: false }));
+    bars.attachCode(main);
     // Puts the bar where the wave has it, reaching each end. Far from there (just after a pause), moves `ease` of the
     // way instead, so it glides back rather than jumping.
     const place = (element: HTMLElement, index: number, time: number, ease: number): void => {

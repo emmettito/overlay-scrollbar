@@ -73,46 +73,63 @@
   background: var(--hover);
 }
 .examples .code pre {
+  /* The gutter: as wide as the last line's number, with room either side */
+  --gutter: calc(var(--digits, 2) * 1ch + 22px);
+  /* Every other line shaded, between the top and bottom padding only. On the gutter and the lines alike, so a row's
+     shade runs unbroken across the divider. */
+  --stripes: repeating-linear-gradient(transparent 0 1lh, color-mix(in srgb, var(--text) 4%, transparent) 0 2lh) 0
+    10px / 100% calc(100% - 20px) no-repeat;
   margin: 6px 0 0;
   background: var(--code-bg);
   color: var(--text);
-  padding: 10px 12px 10px 0;
+  /* Here rather than on the code, so the gutter's ch is the code's */
+  font:
+    12px/1.5 'Geist Mono Variable',
+    ui-monospace,
+    monospace;
   border: 1px solid var(--border);
   border-radius: 8px;
   overflow: auto;
   max-height: 320px;
 }
 .examples .code pre code {
-  /* As wide as the longest line, so the gutter below stays put all the way along it */
-  display: block;
+  /* The gutter beside the lines, both as tall as the code. As wide as the longest line, so the gutter stays put all
+     the way along it. */
+  display: flex;
   width: max-content;
   min-width: 100%;
-  counter-reset: line;
-  font:
-    12px/1.5 'Geist Mono Variable',
-    ui-monospace,
-    monospace;
+  font: inherit;
 }
-/* Line numbers in a gutter that stays put as the code scrolls sideways. Generated content, so selecting and copying
-   the code leaves them out. */
-.examples .code .line {
-  counter-increment: line;
-}
-.examples .code .line::before {
-  content: counter(line);
+/* Line numbers in a gutter that stays put as the code scrolls sideways, covering the code scrolling under it. Its
+   divider runs top to bottom, padding included, and is part of the scrolled content, so it moves with the code when
+   the browser bounces it past either end. Generated content, so selecting and copying the code leaves them out. */
+.examples .code .gutter {
   position: sticky;
   left: 0;
-  display: inline-block;
+  flex: none;
   box-sizing: border-box;
-  width: calc(2ch + 22px);
-  padding: 0 10px 0 12px;
-  margin-right: 10px;
+  width: var(--gutter);
+  padding: 10px 10px 10px 12px;
   text-align: end;
   color: var(--text-faint);
-  background: var(--code-bg);
+  background: var(--stripes), var(--code-bg);
   border-right: 1px solid var(--border);
+  counter-reset: line;
   -webkit-user-select: none;
   user-select: none;
+}
+.examples .code .gutter span {
+  display: block;
+  counter-increment: line;
+}
+.examples .code .gutter span::before {
+  content: counter(line);
+}
+/* Growing to the box's width, so short code's stripes still reach the right edge */
+.examples .code .lines {
+  flex: 1;
+  padding: 10px 12px 10px 10px;
+  background: var(--stripes);
 }
 .examples .code .caption {
   margin: 12px 0 0;

@@ -108,12 +108,15 @@ const groups: { title: string; examples: Example[] }[] = [
 
 const examples = groups.flatMap(group => group.examples);
 
-/** Code a line at a time, for the stylesheet to number: the numbers aren't text, so copying the code leaves them out */
-function codeLines(code: string): Html {
-  return html`${code
-    .replace(/\n$/, '')
-    .split('\n')
-    .map(line => html`<span class="line">${line}</span>\n`)}`;
+/**
+ * A code block with a gutter of a span per line, for the stylesheet to number: the numbers aren't text, so copying the
+ * code leaves them out. --digits is how many the last line's number has, for the gutter's width.
+ */
+function codeBlock(code: string): Html {
+  const lines = code.replace(/\n$/, '').split('\n');
+  return html`<pre style="--digits: ${String(lines.length).length}"><code><span class="gutter" aria-hidden="true">${lines.map(
+    () => html`<span></span>`
+  )}</span><span class="lines">${lines.join('\n')}</span></code></pre>`;
 }
 
 /** The attach call with these options, as an app would write it. */
@@ -154,14 +157,14 @@ export const styling: Page = {
                   example.options &&
                   html`
                   <p class="caption">JavaScript</p>
-                  <pre><code>${codeLines(optionsCode(example.options))}</code></pre>
+                  ${codeBlock(optionsCode(example.options))}
                 `
                 }
                 ${
                   example.css &&
                   html`
                   <p class="caption">CSS</p>
-                  <pre><code>${codeLines(sources[example.css] ?? '')}</code></pre>
+                  ${codeBlock(sources[example.css] ?? '')}
                 `
                 }
               </details>
@@ -178,6 +181,7 @@ export const styling: Page = {
     main.querySelectorAll<HTMLElement>('[data-example]').forEach(box => {
       bars.attach(box, examples[Number(box.dataset['example'])].options);
     });
+    bars.attachCode(main);
     return () => bars.destroy();
   }
 };
