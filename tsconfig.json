@@ -1,5 +1,5 @@
 // The editor's entry point: it finds each file's settings through these (the library's, the specs' with test globals,
-// or Node's for the configs)
+// or Node's for the configs and scripts)
 {
   "files": [],
   "references": [

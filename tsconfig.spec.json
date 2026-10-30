@@ -1,11 +1,12 @@
-// The library's specs: strict settings under a bundler's module rules, plus vitest's globals (describe, it, vi)
+// The library's specs: strict settings under a bundler's module rules, plus Vite's client types (for the stylesheet
+// import) and vitest's globals (describe, it, vi)
 {
   "compilerOptions": {
     "target": "ES2022",
     "useDefineForClassFields": true,
     "module": "ESNext",
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
-    "types": ["vitest/globals"],
+    "types": ["vite/client", "vitest/globals"],
     "skipLibCheck": true,
 
     /* Bundler mode */
