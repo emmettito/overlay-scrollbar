@@ -1,4 +1,4 @@
-// The ESLint and Vitest configs and the scripts, which run in Node rather than the browser
+// The ESLint and Vitest configs and the build scripts, which run in Node rather than the browser
 {
   "compilerOptions": {
     "target": "ES2023",
