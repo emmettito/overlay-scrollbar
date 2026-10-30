@@ -12,7 +12,7 @@ const page = pathToFileURL(join(root, 'dist/index.html')).href;
 
 // Each route, and how many of the page's own frames (bars) it should have
 const routes = {
-  '': 7,
+  '': 9,
   list: 1,
   table: 1,
   'changing-content': 1,
@@ -21,12 +21,12 @@ const routes = {
   rtl: 2,
   virtual: 1,
   'drag-drop': 2,
-  styling: 13,
-  // The framework demos' bars are in their iframes, checked below
-  angular: 0,
-  react: 0,
-  vue: 0,
-  svelte: 0
+  styling: 26,
+  // The code panels'; the framework demos' own bars are in their iframes, checked below
+  angular: 2,
+  react: 2,
+  vue: 2,
+  svelte: 2
 };
 
 const failures: string[] = [];

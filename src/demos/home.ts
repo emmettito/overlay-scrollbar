@@ -37,8 +37,9 @@ function notice(): string | undefined {
   }
   if (!drawsOverlayScrollbars()) {
     return (
-      'By default, the library leaves the native scrollbars alone on a touch-only device; its force option draws its ' +
-      'bars there too. The bars here and in the demos are forced on, to show them.'
+      'By default, the library leaves the native scrollbars alone on a touch-only device; its force option draws ' +
+      'its bars there too. The boxes’ bars here and in the demos are forced on, to show them; the code blocks keep ' +
+      'the default.'
     );
   }
   return undefined;
@@ -71,6 +72,7 @@ export const home: Page = {
     const bars = new Bars();
     const scrollers = rainbow.map(color => find(main, `.rainbow .${color}`));
     scrollers.forEach(element => bars.attach(element, { autoHide: false }));
+    bars.attachCode(main);
     // Puts the bar where the wave has it, reaching each end. Far from there (just after a pause), moves `ease` of the
     // way instead, so it glides back rather than jumping.
     const place = (element: HTMLElement, index: number, time: number, ease: number): void => {

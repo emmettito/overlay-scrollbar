@@ -1,6 +1,6 @@
 import { currentTheme } from '../theme';
 import './framework-page.css';
-import { html, Page, render } from './page';
+import { Bars, html, Page, render } from './page';
 
 export type Framework = 'angular' | 'react' | 'vue' | 'svelte';
 
@@ -83,7 +83,13 @@ export function frameworkPage(framework: Framework): Page {
       const iframe = main.querySelector('iframe');
       const sendTheme = (): void => iframe?.contentWindow?.postMessage({ theme: currentTheme() }, '*');
       addEventListener('themechange', sendTheme);
-      return () => removeEventListener('themechange', sendTheme);
+
+      const bars = new Bars();
+      bars.attachCode(main);
+      return () => {
+        removeEventListener('themechange', sendTheme);
+        bars.destroy();
+      };
     }
   };
 }
