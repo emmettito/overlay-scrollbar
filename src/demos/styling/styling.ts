@@ -11,10 +11,10 @@ import './customise/layers.css';
 import './customise/light-panel.css';
 import './customise/slow.css';
 import './styling-base.css';
-import './themes/candy-shop.css';
 import './themes/cyberspace.css';
-import './themes/fairy-dust.css';
-import './themes/powerup.css';
+import './themes/peppermint.css';
+import './themes/rainbow.css';
+import './themes/retro.css';
 
 interface Example {
   name: string;
@@ -98,10 +98,10 @@ const groups: { title: string; examples: Example[] }[] = [
   {
     title: 'Themes',
     examples: [
-      { name: 'Power-up', className: 'theme-powerup', css: './themes/powerup.css', rows: lines },
-      { name: 'Fairy dust', className: 'theme-fairy-dust', css: './themes/fairy-dust.css', rows: lines },
+      { name: 'Retro', className: 'theme-retro', css: './themes/retro.css', rows: lines },
+      { name: 'Rainbow', className: 'theme-rainbow', css: './themes/rainbow.css', rows: lines },
       { name: 'Cyberspace', className: 'theme-cyberspace', css: './themes/cyberspace.css', rows: lines },
-      { name: 'Candy shop', className: 'theme-candy-shop', css: './themes/candy-shop.css', rows: lines }
+      { name: 'Peppermint', className: 'theme-peppermint', css: './themes/peppermint.css', rows: lines }
     ]
   }
 ];

@@ -1,0 +1,87 @@
+/* Rainbow: a rainbow that drifts and sways along the thumbs, for vertical bars */
+
+/* Drawn on the thumb's ::before, which fills it: the library moves the thumb with its own animation */
+.theme-rainbow + .overlay-scrollbar-frame .overlay-scrollbar-thumb::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+.theme-rainbow {
+  --overlay-scrollbar-width: 9px;
+  --overlay-scrollbar-expanded-width: 15px;
+  background: linear-gradient(160deg, #fff0fa, #f1ecff 50%, #e8fbff);
+  color: #8a4fa8;
+  font:
+    500 14px/1.4 'Fredoka Variable',
+    sans-serif;
+}
+.theme-rainbow + .overlay-scrollbar-frame .overlay-scrollbar-bar::before {
+  background: rgb(195 177 255 / 0.25);
+}
+.theme-rainbow + .overlay-scrollbar-frame .overlay-scrollbar-thumb,
+.theme-rainbow + .overlay-scrollbar-frame .overlay-scrollbar-thumb:hover {
+  background: transparent;
+}
+/* Registered, so the offset and angle animate smoothly rather than jumping */
+@property --rainbow-shift {
+  syntax: '<length>';
+  inherits: false;
+  initial-value: 0px;
+}
+@property --rainbow-tilt {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 180deg;
+}
+/* A repeating rainbow, 120px a cycle, so it has no seams at any offset or angle. It drifts one way and back by uneven
+   amounts while its bands sway across the thumb, on cycles that rarely line up, so it seems to flow at random. */
+.theme-rainbow + .overlay-scrollbar-frame .overlay-scrollbar-thumb::before {
+  background: repeating-linear-gradient(
+    var(--rainbow-tilt),
+    #ff5e5e var(--rainbow-shift),
+    #ffa94d calc(var(--rainbow-shift) + 20px),
+    #ffe14d calc(var(--rainbow-shift) + 40px),
+    #6bdb6b calc(var(--rainbow-shift) + 60px),
+    #4dabff calc(var(--rainbow-shift) + 80px),
+    #9b6bff calc(var(--rainbow-shift) + 100px),
+    #ff5e5e calc(var(--rainbow-shift) + 120px)
+  );
+  animation:
+    rainbow-flow 12s ease-in-out infinite,
+    rainbow-wave 2.8s ease-in-out infinite alternate;
+}
+@keyframes rainbow-flow {
+  0%,
+  100% {
+    --rainbow-shift: 0px;
+  }
+  23% {
+    --rainbow-shift: 170px;
+  }
+  36% {
+    --rainbow-shift: 70px;
+  }
+  56% {
+    --rainbow-shift: 220px;
+  }
+  93% {
+    --rainbow-shift: -50px;
+  }
+}
+@keyframes rainbow-wave {
+  from {
+    --rainbow-tilt: 145deg;
+  }
+  to {
+    --rainbow-tilt: 215deg;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .theme-rainbow + .overlay-scrollbar-frame .overlay-scrollbar-thumb::before {
+    animation: none;
+  }
+}

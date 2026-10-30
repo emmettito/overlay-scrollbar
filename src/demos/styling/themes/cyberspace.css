@@ -1,4 +1,4 @@
-/* Cyberspace: a neon gradient flowing through the thumbs, with a pulsing glow */
+/* Cyberspace: a neon gradient flowing through the thumbs, with a pulsing glow, for vertical bars */
 
 /* Every effect is drawn on the thumb's ::before and ::after, which fill it */
 .theme-cyberspace + .overlay-scrollbar-frame .overlay-scrollbar-thumb::before,
@@ -43,10 +43,6 @@
   background: linear-gradient(#ff2a6d, #d300c5, #05d9e8, #ff2a6d) 0 0 / 100% 300%;
   animation: cyberspace-flow 2.4s linear infinite;
 }
-.theme-cyberspace + .overlay-scrollbar-frame .overlay-scrollbar-bar-x .overlay-scrollbar-thumb::before {
-  background: linear-gradient(90deg, #ff2a6d, #d300c5, #05d9e8, #ff2a6d) 0 0 / 300% 100%;
-  animation-name: cyberspace-flow-x;
-}
 .theme-cyberspace + .overlay-scrollbar-frame .overlay-scrollbar-thumb::after {
   box-shadow:
     0 0 8px 1px #ff2a6d,
@@ -60,11 +56,6 @@
 @keyframes cyberspace-flow {
   to {
     background-position: 0 300%;
-  }
-}
-@keyframes cyberspace-flow-x {
-  to {
-    background-position: 300% 0;
   }
 }
 @keyframes cyberspace-pulse {
