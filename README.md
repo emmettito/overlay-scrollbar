@@ -2,6 +2,8 @@
 
 Overlay scrollbars for any scrollable element, in plain TypeScript with no dependencies.
 
+See them in the [demo app](https://emmettito.github.io/overlay-scrollbar/).
+
 ## Using the library
 
 The package isn't on npm. Build it from this repository, then install the file it writes:
