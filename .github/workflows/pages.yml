@@ -25,9 +25,16 @@ jobs:
       - uses: actions/setup-node@v7
         with:
           node-version: 24
-          cache: npm
-      # The npm package.json asks for (packageManager), as devEngines refuses an older one
+          # Its npm cache runs Node's own npm, which devEngines refuses: cached below instead, once npm is upgraded
+          package-manager-cache: false
+      # The npm package.json asks for (packageManager), as devEngines refuses an older one. Outside the repository, where
+      # devEngines would refuse the npm doing the upgrade too.
       - run: npm install -g npm@12.2.1
+        working-directory: ${{ runner.temp }}
+      - uses: actions/cache@v6
+        with:
+          path: ~/.npm
+          key: npm-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
       - run: npm ci
       - run: npm run build
       - uses: actions/configure-pages@v6
