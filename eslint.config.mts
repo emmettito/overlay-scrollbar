@@ -68,6 +68,9 @@ const javascriptConfig = defineConfig({
 });
 
 export default [
+  {
+    ignores: ['lib']
+  },
   ...typescriptConfig,
   ...javascriptConfig,
   // After the presets, before the rules below that re-enable some formatting rules

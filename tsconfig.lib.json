@@ -1,6 +1,6 @@
-// The library: src/overlay-scrollbar compiled to JavaScript and type declarations in lib/. Node's module rules, as
-// packages are loaded by them as well as by bundlers: a relative import without its .js extension is an error here, as
-// it would fail in webpack 5 and Node.
+// The packaged library (npm run build:lib): src/overlay-scrollbar compiled to JavaScript and type declarations in
+// lib/. Node's module rules, as packages are loaded by them as well as by bundlers: a relative import without its .js
+// extension is an error here, as it would fail in webpack 5 and Node.
 {
   "compilerOptions": {
     "target": "ES2022",

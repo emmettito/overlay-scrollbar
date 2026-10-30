@@ -15,17 +15,36 @@
     "scroll"
   ],
   "type": "module",
+  "exports": {
+    ".": {
+      "types": "./lib/index.d.ts",
+      "default": "./lib/index.js"
+    },
+    "./overlay-scrollbar.css": "./lib/overlay-scrollbar.css",
+    "./package.json": "./package.json"
+  },
+  "types": "./lib/index.d.ts",
+  "files": [
+    "lib"
+  ],
+  "sideEffects": [
+    "*.css"
+  ],
   "engines": {
     "node": ">=22.18"
   },
   "scripts": {
     "prepare": "husky",
+    "build:lib": "node scripts/build-lib.mts",
+    "prepack": "node scripts/refuse-root-pack.mts",
+    "package": "node scripts/pack.mts",
     "typecheck": "tsc -p tsconfig.lib.json --noEmit && tsc -p tsconfig.node.json && tsc -p tsconfig.spec.json",
     "lint": "eslint . --max-warnings=0",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "test": "vitest run",
-    "test:browser": "vitest run --config vitest.browser.config.mts"
+    "test:browser": "vitest run --config vitest.browser.config.mts",
+    "test:package": "node scripts/test-package.mts"
   },
   "packageManager": "npm@12.2.1",
   "devEngines": {
@@ -40,6 +59,7 @@
     "@stylistic/eslint-plugin": "^5.10.0",
     "@types/node": "^24.19.2",
     "@vitest/browser-playwright": "^5.0.5",
+    "esbuild": "^0.28.2",
     "eslint": "^10.13.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-perfectionist": "^5.13.0",
@@ -57,6 +77,7 @@
     "vitest": "^5.0.5"
   },
   "allowScripts": {
+    "esbuild": false,
     "fsevents": false
   }
 }
