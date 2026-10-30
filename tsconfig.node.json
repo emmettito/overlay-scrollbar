@@ -1,10 +1,11 @@
-// The ESLint and Vitest configs and the build scripts, which run in Node rather than the browser
+// The ESLint and Vitest configs, the build scripts and the benchmark, which run in Node rather than the browser
 {
   "compilerOptions": {
     "target": "ES2023",
     "module": "ESNext",
     "moduleResolution": "bundler",
-    "lib": ["ES2023"],
+    // DOM too, for the callbacks the benchmark runs in the page
+    "lib": ["ES2023", "DOM"],
     "types": ["node"],
     "skipLibCheck": true,
     "noEmit": true,
@@ -15,5 +16,5 @@
     "erasableSyntaxOnly": true,
     "verbatimModuleSyntax": true
   },
-  "include": ["eslint.config.mts", "vitest.config.mts", "vitest.browser.config.mts", "scripts/*.mts"]
+  "include": ["eslint.config.mts", "vitest.config.mts", "vitest.browser.config.mts", "scripts/*.mts", "bench/*.mts"]
 }

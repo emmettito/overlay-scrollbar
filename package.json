@@ -44,7 +44,8 @@
     "format:check": "prettier --check .",
     "test": "vitest run",
     "test:browser": "vitest run --config vitest.browser.config.mts",
-    "test:package": "node scripts/test-package.mts"
+    "test:package": "node scripts/test-package.mts",
+    "bench": "node bench/bench.mts"
   },
   "packageManager": "npm@12.2.1",
   "devEngines": {
