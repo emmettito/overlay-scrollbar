@@ -1,0 +1,32 @@
+# Stages the package on npm when a GitHub release is published, e.g. v0.2.0 for version 0.2.0 in package.json. It's
+# published once approved, with 2FA, on npmjs.com or with npm stage approve. Through npm's trusted publishing: npm takes
+# GitHub's identity token for this workflow in place of an npm token, and adds provenance, linking the version to this
+# repository, commit and run. Set up on npmjs.com, in the package's settings, for this repository and publish.yml.
+name: Publish
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/setup
+      # The release's tag has to name the version being published, so a release can't publish something else
+      - name: Check the tag matches the version
+        env:
+          TAG: ${{ github.event.release.tag_name }}
+        run: |
+          version=$(node -p "require('./package.json').version")
+          if [ "$TAG" != "v$version" ]; then
+            echo "::error::The release's tag is $TAG, but package.json's version is $version (expected v$version)"
+            exit 1
+          fi
+      - run: npm run test:package
+      - run: npm run release -- --stage
