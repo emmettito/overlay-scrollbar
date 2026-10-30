@@ -40,6 +40,8 @@ The browser specs and the benchmark need Playwright's browsers: `npx playwright 
 
 `npm pack` and `npm publish` are refused from the repository root, because they'd include the repository's own scripts and settings. Use `npm run package` and `npm run release` instead.
 
+To publish a new version, change `version` in `package.json` in a pull request, then publish a GitHub release tagged with it (e.g. `v0.2.0`). The Publish workflow publishes it to npm, with provenance.
+
 ## What's where
 
 - `src/overlay-scrollbar/`: the library, with its specs and README. `index.ts` is the public API, and everything else is internal. `overlay-scrollbar.ts` attaches the bars, `overlay-scrollbar-frame.ts` and `overlay-scrollbar-bar.ts` draw them, and `overlay-scrollbar.css` is the stylesheet. How it works is described at the top of `overlay-scrollbar.ts`.
