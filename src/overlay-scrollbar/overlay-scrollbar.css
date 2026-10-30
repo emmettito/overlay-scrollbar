@@ -2,10 +2,9 @@
    every other style overrides it: either list it first in the page's layer order, or import this file first (see
    README.md).
 
-   Measured from Safari on macOS: an 11px pill track inset 3px from the edges, shown only while the pointer is on the
-   bar; a thumb that is 6px while scrolling and fills the track when the pointer is on the bar, with its outer edge
-   fixed so it grows inwards. Shown instantly, faded out as a whole. The colours were matched side by side with Safari's
-   own scrollbars in a screen recording: black at 50% for the thumb (60% under the pointer) and 4.7% for the track.
+   An 11px pill track inset 3px from the edges, shown only while the pointer is on the bar; a thumb that is 6px while
+   scrolling and fills the track when the pointer is on the bar, with its outer edge fixed so it grows inwards. Shown
+   instantly, faded out as a whole. Black at 50% for the thumb (60% under the pointer) and 4.7% for the track.
 
    The --overlay-scrollbar-* custom properties theme it (listed in README.md). The --_overlay-scrollbar-* ones, with
    the leading underscore, are internal: they're set on the frame, by overlay-scrollbar-frame.ts or below, so they

@@ -1,6 +1,6 @@
 /*
-  Overlay scrollbars after macOS (AppKit as Safari draws them), drawn wherever there's a mouse or trackpad. How to use
-  and theme them is in README.md; this is how they work.
+  Overlay scrollbars, drawn wherever there's a mouse or trackpad. How to use and theme them is in README.md; this is
+  how they work.
 
   Scrolling stays native: the element keeps overflow:auto and only its scrollbars are hidden. The bars are drawn in a
   frame placed right after the element and laid over it with CSS anchor positioning (overlay-scrollbar-frame.ts), each
@@ -12,8 +12,8 @@
   mouse may show either. Touch-only devices (phones, tablets) keep their own overlay scrollbars unless those take up
   space. Attached elements follow changes to either while the page is open.
 
-  Sizes, colours and timings were measured from screen recordings of Safari; the sources are noted where each value is
-  defined (overlay-scrollbar.css, models/constants.ts). The less obvious choices are explained where they're made:
+  The default sizes, colours and timings are defined in overlay-scrollbar.css and models/constants.ts. The less obvious
+  choices are explained where they're made:
   - why the bars are drawn outside the element, so no browser's bounce moves them: overlay-scrollbar-frame.ts
   - the contained frame that keeps Safari's keyboard rubber-band working: .overlay-scrollbar-frame in the stylesheet
   - why WebKit moves the thumbs from a scroll listener: utilities/thumbs-use-scroll-timeline.ts
