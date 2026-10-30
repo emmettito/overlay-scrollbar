@@ -1,4 +1,4 @@
 {
-  "*.{ts,tsx,mjs,mts,js}": ["eslint --fix --max-warnings=0", "prettier --write"],
+  "*.{ts,tsx,mjs,mts,js,vue,svelte}": ["eslint --fix --max-warnings=0", "prettier --write"],
   "*.{html,json,css,yml,yaml}": ["prettier --write"]
 }

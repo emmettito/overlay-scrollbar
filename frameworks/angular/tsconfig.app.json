@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "strict": true,
+    "skipLibCheck": true,
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "types": ["vite/client"],
+    "paths": {
+      "@emmettito/overlay-scrollbar": ["../../src/overlay-scrollbar/index.ts"],
+      "@emmettito/overlay-scrollbar/*": ["../../src/overlay-scrollbar/*"]
+    }
+  },
+  "angularCompilerOptions": {
+    "strictInjectionParameters": true,
+    "strictInputAccessModifiers": true,
+    "strictTemplates": true
+  },
+  "include": ["src"],
+  // The specs have their own settings, with the test globals (tsconfig.spec.json)
+  "exclude": ["src/**/*.spec.ts"]
+}

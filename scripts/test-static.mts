@@ -1,6 +1,6 @@
 // Opens the build (npm run build) straight from disk, as a file:// URL, in Chromium, WebKit and Firefox, and checks
-// every page: no errors, and the comparison pages' library columns have their bars. Run with `npm run test:static`,
-// which builds first; first `npx playwright install chromium webkit firefox`.
+// every page: no errors, the comparison pages' library columns have their bars, and the framework demos work. Run with
+// `npm run test:static`, which builds first; first `npx playwright install chromium webkit firefox`.
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -21,7 +21,12 @@ const routes = {
   rtl: 2,
   virtual: 1,
   'drag-drop': 2,
-  styling: 9
+  styling: 9,
+  // The framework demos' bars are in their iframes, checked below
+  angular: 0,
+  react: 0,
+  vue: 0,
+  svelte: 0
 };
 
 const failures: string[] = [];
@@ -72,6 +77,28 @@ for (const [name, type, env] of browsers) {
   );
   if (appBars.length !== 2) {
     fail(`only ${appBars.join(' and ') || 'nothing'} of main and the nav's links has bars`);
+  }
+
+  // Each framework demo, in its iframe: its list has bars, and adding items updates it
+  for (const framework of ['angular', 'react', 'vue', 'svelte']) {
+    await tab.goto(`${page}#/${framework}`);
+    const demo = tab.frameLocator('iframe');
+    await demo
+      .locator('.list')
+      .waitFor({ timeout: 5000 })
+      .catch(() => undefined);
+    const demoBars = await demo.locator('.list + .overlay-scrollbar-frame').count();
+    await demo
+      .getByText('Add 10 items')
+      .click({ timeout: 5000 })
+      .catch(() => undefined);
+    const count = await demo
+      .locator('.count')
+      .textContent({ timeout: 5000 })
+      .catch(() => null);
+    if (demoBars !== 1 || count !== '40 items') {
+      fail(`the ${framework} demo has ${demoBars} bars and reads ${count} after adding 10 items`);
+    }
   }
 
   // The Styling page's Cascade layers example: the later layer's colour wins
@@ -125,6 +152,22 @@ for (const [name, type, env] of browsers) {
   const after = await shown();
   if (before.theme === after.theme || before.panel === after.panel || !after.panel) {
     fail(`the theme toggle went from ${JSON.stringify(before)} to ${JSON.stringify(after)}`);
+  }
+
+  // A framework demo's theme follows the app's, which its iframe is told rather than left to its color-scheme
+  await tab.goto(`${page}#/react`);
+  const demoList = tab.frameLocator('iframe').locator('.list');
+  const demoBackground = (): Promise<string> => demoList.evaluate(element => getComputedStyle(element).backgroundColor);
+  const demoBefore = await demoBackground();
+  await tab.click('.theme-toggle');
+  // The theme reaches the iframe as a message, so this waits for it to change rather than a fixed time, up to 5s
+  let demoAfter = await demoBackground();
+  for (const deadline = Date.now() + 5000; demoAfter === demoBefore && Date.now() < deadline;) {
+    await tab.waitForTimeout(50);
+    demoAfter = await demoBackground();
+  }
+  if (demoBefore === demoAfter) {
+    fail(`the React demo stayed ${demoBefore} when the theme changed`);
   }
 
   // Unknown routes, including ones named like Object's own properties, go home

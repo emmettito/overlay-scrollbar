@@ -1,11 +1,14 @@
-// typescript-eslint's recommended rules for all the code, and a few conventions: class members in a fixed order, and in
-// TypeScript explicit accessibility and return types. Formatting is Prettier's (eslint-config-prettier turns off the
-// rules it would clash with).
+// typescript-eslint's recommended rules for all the code, angular-eslint's for the Angular demo, Vue's and Svelte's for
+// theirs, and a few conventions: class members in a fixed order, and in TypeScript explicit accessibility and return
+// types. Formatting is Prettier's (eslint-config-prettier turns off the rules it would clash with).
 import js from '@eslint/js';
 import stylistic from '@stylistic/eslint-plugin';
+import angular from 'angular-eslint';
 import type { Linter } from 'eslint';
 import prettier from 'eslint-config-prettier';
 import perfectionist from 'eslint-plugin-perfectionist';
+import svelte from 'eslint-plugin-svelte';
+import vue from 'eslint-plugin-vue';
 import { defineConfig } from 'eslint/config';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
@@ -67,16 +70,55 @@ const javascriptConfig = defineConfig({
   }
 });
 
+// The Angular demo's code and inline templates
+const angularConfig = defineConfig(
+  // Scoped last, so it holds even if a preset names files of its own. Cast, as typescript-eslint's config type differs
+  // slightly from ESLint's.
+  ...angular.configs.tsRecommended.map(
+    config => ({ ...config, files: ['frameworks/angular/**/*.ts'] }) as Linter.Config
+  ),
+  {
+    files: ['frameworks/angular/**/*.ts'],
+    languageOptions: { globals: { ...globals.browser, ...globals.es2015, ...globals.node } },
+    processor: angular.processInlineTemplates,
+    plugins: { '@angular-eslint': angular.tsPlugin }
+  },
+  {
+    files: ['frameworks/angular/**/*.html'],
+    extends: [...angular.configs.templateRecommended, ...angular.configs.templateAccessibility]
+  }
+);
+
+// The Vue and Svelte demos' components: the same rules as the rest of the code, then their frameworks' (whose parsers
+// replace typescript-eslint's, and hand the scripts to it)
+const componentFiles = ['**/*.vue', '**/*.svelte'];
+const componentConfig = defineConfig(
+  {
+    files: ['**/*.vue'],
+    extends: [...recommended, ...vue.configs['flat/recommended']],
+    languageOptions: { parserOptions: { parser: tseslint.parser } },
+    rules: sharedRules
+  },
+  {
+    files: ['**/*.svelte'],
+    extends: [...recommended, ...svelte.configs.recommended, ...svelte.configs.prettier],
+    languageOptions: { parserOptions: { parser: tseslint.parser } },
+    rules: sharedRules
+  }
+);
+
 export default [
   {
-    ignores: ['**/dist', 'lib']
+    ignores: ['**/dist', 'lib', 'public/frameworks']
   },
   ...typescriptConfig,
   ...javascriptConfig,
+  ...angularConfig,
+  ...componentConfig,
   // After the presets, before the rules below that re-enable some formatting rules
   prettier,
   {
-    files: [...tsFiles, ...jsFiles],
+    files: [...tsFiles, ...jsFiles, ...componentFiles],
     plugins: {
       '@perfectionist': perfectionist,
       '@stylistic': stylistic
@@ -105,15 +147,35 @@ export default [
           partitionByComment: false,
           partitionByNewLine: false,
           newlinesBetween: 'ignore',
+          ignoreCallbackDependenciesPatterns: ['^(computed|linkedSignal)$'],
           groups: [
             ['private-property', 'private-accessor-property', 'private-get-method', 'private-set-method'],
             ['protected-property', 'protected-accessor-property', 'protected-get-method', 'protected-set-method'],
             ['property', 'accessor-property', 'get-method', 'set-method'],
             'constructor',
+            'ngOnInit',
+            'ngOnChanges',
+            'ngDoCheck',
+            'ngAfterContentInit',
+            'ngAfterContentChecked',
+            'ngAfterViewInit',
+            'ngAfterViewChecked',
+            'ngOnDestroy',
             ['method', 'function-property'],
             ['protected-method', 'protected-function-property'],
             ['private-method', 'private-function-property'],
             'unknown'
+          ],
+          customGroups: [
+            // Angular component lifecycle hooks, in the order described by https://angular.dev/guide/components/lifecycle
+            { groupName: 'ngOnInit', elementNamePattern: 'ngOnInit' },
+            { groupName: 'ngOnChanges', elementNamePattern: 'ngOnChanges' },
+            { groupName: 'ngDoCheck', elementNamePattern: 'ngDoCheck' },
+            { groupName: 'ngAfterContentInit', elementNamePattern: 'ngAfterContentInit' },
+            { groupName: 'ngAfterContentChecked', elementNamePattern: 'ngAfterContentChecked' },
+            { groupName: 'ngAfterViewInit', elementNamePattern: 'ngAfterViewInit' },
+            { groupName: 'ngAfterViewChecked', elementNamePattern: 'ngAfterViewChecked' },
+            { groupName: 'ngOnDestroy', elementNamePattern: 'ngOnDestroy' }
           ],
           useExperimentalDependencyDetection: false
         }
@@ -122,7 +184,7 @@ export default [
   },
   // Rules that need TypeScript syntax to fix (`public`/`private`, return type annotations, etc.)
   {
-    files: tsFiles,
+    files: [...tsFiles, ...componentFiles],
     rules: {
       '@typescript-eslint/explicit-member-accessibility': [
         'warn',

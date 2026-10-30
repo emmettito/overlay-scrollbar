@@ -21,6 +21,9 @@
     "vite.config.ts",
     "vitest.config.mts",
     "vitest.browser.config.mts",
+    "frameworks/vitest.config.mts",
+    "frameworks/*/vite.config.mts",
+    "frameworks/angular/vitest.config.mts",
     "scripts/*.mts",
     "bench/*.mts"
   ]

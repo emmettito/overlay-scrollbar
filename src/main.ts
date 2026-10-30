@@ -8,6 +8,7 @@ import '@fontsource-variable/inter';
 import './styles.css';
 import { changingContent, dialog, list, table } from './demos/compare';
 import { dragDrop } from './demos/drag-drop';
+import { frameworkPage } from './demos/framework-page';
 import { home } from './demos/home';
 import { nested } from './demos/nested';
 import { Bars, find, Page } from './demos/page';
@@ -27,7 +28,11 @@ const pages: Record<string, Page> = {
   rtl,
   virtual,
   'drag-drop': dragDrop,
-  styling
+  styling,
+  angular: frameworkPage('angular'),
+  react: frameworkPage('react'),
+  vue: frameworkPage('vue'),
+  svelte: frameworkPage('svelte')
 };
 
 const main = find(document, 'main');
