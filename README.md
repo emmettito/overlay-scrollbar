@@ -34,13 +34,14 @@ npm run test           # the unit specs, in jsdom
 npm run test:browser   # the browser specs, in Chromium, WebKit and Firefox
 npm run build:lib      # builds the library into lib/
 npm run package        # builds and packs it as overlay-scrollbar-<version>.tgz
+npm run release        # builds it and publishes it to npm
 npm run test:package   # packs it, installs it in a temporary project, and checks it works there
 npm run bench          # performance against native scrollbars, in all three browsers (several minutes)
 ```
 
 The browser specs and the benchmark need Playwright's browsers: `npx playwright install chromium webkit firefox`, with `--with-deps` on Linux.
 
-`npm pack` and `npm publish` are refused from the repository root, because they'd include the repository's own scripts and settings. Use `npm run package` instead.
+`npm pack` and `npm publish` are refused from the repository root, because they'd include the repository's own scripts and settings. Use `npm run package` and `npm run release` instead.
 
 ## What's where
 
