@@ -28,7 +28,7 @@ You need Node 22.18 or later and npm 12 or later. If your Node came with an olde
 npm install
 npm run typecheck      # the library, its specs, and the configs and scripts
 npm run lint           # ESLint (npm run format formats the code with Prettier)
-npm test               # the unit specs, in jsdom
+npm run test           # the unit specs, in jsdom
 npm run test:browser   # the browser specs, in Chromium, WebKit and Firefox
 npm run build:lib      # builds the library into lib/
 npm run package        # builds and packs it as overlay-scrollbar-<version>.tgz

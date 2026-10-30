@@ -1,0 +1,5 @@
+/* A slower fade and widening (the timings are options, shown above) */
+.slow-bars {
+  --overlay-scrollbar-fade-duration: 1s;
+  --overlay-scrollbar-expand-duration: 0.5s;
+}

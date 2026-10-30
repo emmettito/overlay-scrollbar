@@ -1,0 +1,22 @@
+/* The colours, named once so the layers below read clearly */
+:root {
+  --coral: #eb5757;
+  --violet: #5e6ad2;
+  --violet-dark: #4f5bc4;
+}
+
+/* Layers in the order they're declared: a later one overrides an earlier one */
+@layer defaults, brand;
+
+@layer defaults {
+  .layered {
+    --overlay-scrollbar-thumb-color: var(--coral);
+  }
+}
+
+@layer brand {
+  .layered {
+    --overlay-scrollbar-thumb-color: var(--violet);
+    --overlay-scrollbar-thumb-hover-color: var(--violet-dark);
+  }
+}

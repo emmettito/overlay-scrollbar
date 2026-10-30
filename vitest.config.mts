@@ -1,6 +1,7 @@
 import { defineConfig } from 'vitest/config';
 
-// The unit specs: the library's, in jsdom. *.browser.spec.ts run in real browsers instead (vitest.browser.config.mts).
+// The unit specs: in jsdom, the library's and the demo app's; in Node, the build scripts'. *.browser.spec.ts run in
+// real browsers instead (vitest.browser.config.mts).
 const jsdom = { globals: true, environment: 'jsdom' as const, setupFiles: ['./src/overlay-scrollbar/vitest-setup.ts'] };
 
 export default defineConfig({
@@ -15,7 +16,10 @@ export default defineConfig({
           include: ['src/overlay-scrollbar/**/*.spec.ts'],
           exclude: ['src/overlay-scrollbar/**/*.browser.spec.ts']
         }
-      }
+      },
+      { test: { ...jsdom, name: 'app', include: ['src/demos/**/*.spec.ts'] } },
+      // The build scripts, in Node
+      { test: { name: 'scripts', environment: 'node', include: ['scripts/**/*.spec.mts'] } }
     ]
   }
 });

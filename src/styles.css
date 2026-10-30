@@ -1,0 +1,439 @@
+/* The app's colours, light or dark as data-theme on the root says (src/theme.ts). The demos' stylesheets use these
+   rather than colours of their own; the Styling examples' own CSS is left as it is. */
+:root {
+  color-scheme: light;
+  --bg: #fcfcfd;
+  --sidebar: #f5f6f8;
+  --surface: #fff;
+  --surface-muted: #f7f8f9;
+  --border: #e3e4e8;
+  --border-subtle: #eff0f2;
+  --border-strong: #c9cbd1;
+  --text: #1b1c1f;
+  --text-muted: #6b6f76;
+  --text-faint: #9a9da3;
+  --hover: #ebecef;
+  --active: #e4e5ea;
+  --accent: #5e6ad2;
+  --accent-soft: rgb(94 106 210 / 0.12);
+  /* The main action's fill: the same in both themes, so white text on it stays readable */
+  --primary: #5e6ad2;
+  --primary-hover: #4f5bc4;
+  --code-bg: #f4f5f7;
+  --shadow: rgb(0 0 0 / 0.12);
+  --backdrop: rgb(0 0 0 / 0.3);
+}
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --bg: #0f1012;
+  --sidebar: #0a0b0c;
+  --surface: #16171a;
+  --surface-muted: #1b1c20;
+  --border: #2a2c31;
+  --border-subtle: #1f2125;
+  --border-strong: #3b3e45;
+  --text: #e3e4e8;
+  --text-muted: #8a8f98;
+  --text-faint: #62666d;
+  --hover: #1c1d21;
+  --active: #24262b;
+  --accent: #7c86e8;
+  --accent-soft: rgb(124 134 232 / 0.16);
+  --code-bg: #1b1c20;
+  --shadow: rgb(0 0 0 / 0.5);
+  --backdrop: rgb(0 0 0 / 0.55);
+  /* The library's bars default to dark thumbs: light ones here, so they show on the dark surfaces */
+  --overlay-scrollbar-thumb-color: rgb(255 255 255 / 0.4);
+  --overlay-scrollbar-thumb-hover-color: rgb(255 255 255 / 0.55);
+  --overlay-scrollbar-track-color: rgb(255 255 255 / 0.06);
+}
+
+body {
+  margin: 0;
+  font:
+    13px/1.5 'Inter Variable',
+    system-ui,
+    sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr);
+  align-items: start;
+}
+h1 {
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin: 0 0 6px;
+}
+h2 {
+  font-size: 13px;
+  font-weight: 500;
+  margin: 0 0 8px;
+}
+h2 small {
+  font-weight: normal;
+  color: var(--text-muted);
+}
+a {
+  color: var(--accent);
+}
+.note {
+  margin: 0 0 16px;
+  color: var(--text-muted);
+  max-width: 900px;
+}
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  margin-bottom: 20px;
+}
+button {
+  font: inherit;
+  font-weight: 500;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  /* Buttons and fields the same height, side by side in a row of controls */
+  box-sizing: border-box;
+  height: 28px;
+  padding: 0 12px;
+  cursor: pointer;
+}
+button:hover {
+  background: var(--hover);
+}
+/* The main action: filled with the accent */
+button.primary {
+  color: #fff;
+  background: var(--primary);
+  border-color: var(--primary);
+}
+button.primary:hover {
+  background: var(--primary-hover);
+  border-color: var(--primary-hover);
+}
+/* One choice out of a few, as a single control: the chosen one raised */
+.segmented {
+  display: inline-flex;
+  gap: 2px;
+  padding: 2px;
+  background: var(--surface-muted);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+}
+.segmented button {
+  height: 22px;
+  padding: 0 10px;
+  color: var(--text-muted);
+  background: none;
+  border: 0;
+  border-radius: 5px;
+}
+.segmented button:hover {
+  color: var(--text);
+  background: none;
+}
+.segmented button.on {
+  color: var(--text);
+  background: var(--surface);
+  box-shadow:
+    0 0 0 1px var(--border),
+    0 1px 2px var(--shadow);
+}
+label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+/* A plain field: no spinner (the arrow keys still step it), and the accent with a halo when focused */
+input[type='number'] {
+  width: 80px;
+  font: inherit;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  box-sizing: border-box;
+  height: 28px;
+  padding: 0 8px;
+  appearance: textfield;
+}
+input[type='number']::-webkit-inner-spin-button,
+input[type='number']::-webkit-outer-spin-button {
+  appearance: none;
+  margin: 0;
+}
+input[type='number']:hover {
+  border-color: var(--border-strong);
+}
+input[type='number']:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+/* The same accent ring on everything else focused from the keyboard */
+:is(a, button, summary, input[type='checkbox']):focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+input[type='checkbox'] {
+  appearance: none;
+  flex: none;
+  width: 14px;
+  height: 14px;
+  margin: 0;
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: 4px;
+  cursor: pointer;
+}
+input[type='checkbox']:checked {
+  border-color: var(--accent);
+  background: var(--accent)
+    url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 14'><path d='M3.5 7.2 6 9.6l4.5-5' fill='none' stroke='white' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/></svg>")
+    center / 12px no-repeat;
+}
+/* A thin track, filled with the accent up to the thumb (--fill, set by the page as the value changes) */
+input[type='range'] {
+  appearance: none;
+  width: 160px;
+  height: 14px;
+  margin: 0;
+  background: none;
+  cursor: pointer;
+}
+input[type='range']::-webkit-slider-runnable-track {
+  height: 4px;
+  border-radius: 2px;
+  background:
+    linear-gradient(var(--accent) 0 0) 0 / var(--fill, 0%) 100% no-repeat,
+    var(--border);
+}
+input[type='range']::-moz-range-track {
+  height: 4px;
+  border-radius: 2px;
+  background:
+    linear-gradient(var(--accent) 0 0) 0 / var(--fill, 0%) 100% no-repeat,
+    var(--border);
+}
+input[type='range']::-webkit-slider-thumb {
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  margin-top: -5px;
+  border-radius: 50%;
+  background: #fff;
+  border: 1px solid var(--border-strong);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.15);
+}
+/* A halo on the thumb when focused from the keyboard, rather than a ring around the whole control */
+input[type='range']:focus-visible {
+  outline: none;
+}
+input[type='range']:focus-visible::-webkit-slider-thumb {
+  box-shadow: 0 0 0 3px var(--accent-soft);
+  border-color: var(--accent);
+}
+input[type='range']:focus-visible::-moz-range-thumb {
+  box-shadow: 0 0 0 3px var(--accent-soft);
+  border-color: var(--accent);
+}
+input[type='range']::-moz-range-thumb {
+  box-sizing: border-box;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #fff;
+  border: 1px solid var(--border-strong);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.15);
+}
+/* The label over each side of a comparison, Native or overlay-scrollbar */
+.label {
+  margin: 0 0 6px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+.panels {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  align-items: flex-start;
+}
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px;
+}
+.row {
+  padding: 7px 10px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+.muted {
+  color: var(--text-faint);
+}
+.links li {
+  margin-bottom: 8px;
+}
+/* The nav in a sidebar on the left, staying put as the page scrolls */
+nav {
+  position: sticky;
+  top: 0;
+  box-sizing: border-box;
+  height: 100vh;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 16px 10px;
+  background: var(--sidebar);
+  border-right: 1px solid var(--border);
+}
+nav a {
+  color: var(--text-muted);
+  font-weight: 500;
+  text-decoration: none;
+  padding: 5px 10px;
+  border-radius: 6px;
+}
+nav a:hover {
+  color: var(--text);
+  background: var(--hover);
+}
+nav a.active {
+  color: var(--text);
+  background: var(--active);
+}
+/* A switch at the bottom of the sidebar: on for the dark theme */
+.theme-toggle {
+  height: auto;
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  color: var(--text-muted);
+  background: none;
+  border: 0;
+  padding: 5px 10px;
+}
+.theme-toggle:hover {
+  color: var(--text);
+  background: none;
+}
+.theme-toggle .switch {
+  position: relative;
+  flex: none;
+  width: 26px;
+  height: 16px;
+  border-radius: 8px;
+  background: var(--border-strong);
+  transition: background-color 0.15s;
+}
+.theme-toggle .switch::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.2);
+  transition: translate 0.15s;
+}
+.theme-toggle[aria-checked='true'] .switch {
+  background: var(--accent);
+}
+.theme-toggle[aria-checked='true'] .switch::after {
+  translate: 10px;
+}
+main {
+  padding: 28px 32px;
+}
+/* On narrow screens, back to a bar across the top */
+.topbar,
+.nav-backdrop {
+  display: none;
+}
+/* On narrow screens, a bar across the top whose menu button slides the nav out over the page (src/menu.ts). The bars'
+   frames have a z-index of 999 and up, so these sit above them. The breakpoint is also in src/menu.ts and the demos'
+   stylesheets: change them together. */
+@media (max-width: 720px) {
+  body {
+    display: block;
+  }
+  body.nav-open {
+    overflow: hidden;
+  }
+  .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 1100;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: var(--sidebar);
+    border-bottom: 1px solid var(--border);
+  }
+  .topbar-title {
+    font-weight: 600;
+  }
+  .menu-button {
+    height: auto;
+    display: flex;
+    padding: 6px;
+    color: var(--text-muted);
+    background: none;
+    border: 0;
+  }
+  .menu-button:hover {
+    color: var(--text);
+    background: var(--hover);
+  }
+  .nav-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 1150;
+    background: var(--backdrop);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+  }
+  .nav-open .nav-backdrop {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1200;
+    width: 260px;
+    max-width: 85vw;
+    height: 100dvh;
+    box-shadow: 0 0 24px var(--shadow);
+    translate: -100%;
+    /* Hidden when closed, so its links aren't tabbed to off screen */
+    visibility: hidden;
+    transition:
+      translate 0.2s,
+      visibility 0s 0.2s;
+  }
+  .nav-open nav {
+    translate: 0;
+    visibility: visible;
+    transition: translate 0.2s;
+  }
+  main {
+    padding: 20px 16px;
+  }
+}

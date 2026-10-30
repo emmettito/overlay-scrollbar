@@ -69,7 +69,7 @@ const javascriptConfig = defineConfig({
 
 export default [
   {
-    ignores: ['lib']
+    ignores: ['**/dist', 'lib']
   },
   ...typescriptConfig,
   ...javascriptConfig,

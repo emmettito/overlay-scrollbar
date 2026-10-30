@@ -1,0 +1,96 @@
+.compare .box {
+  width: 320px;
+  height: 360px;
+  overflow: auto;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  white-space: nowrap;
+}
+.compare .box p {
+  margin: 0;
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+.compare .note {
+  margin-bottom: 12px;
+}
+.compare table {
+  border-collapse: collapse;
+}
+.compare th,
+.compare td {
+  padding: 7px 12px;
+  border-bottom: 1px solid var(--border-subtle);
+  text-align: start;
+}
+.compare th {
+  position: sticky;
+  top: 0;
+  background: var(--surface-muted);
+}
+.compare .dialog {
+  margin: 80px auto auto;
+  /* Never taller than the screen: the lists in the middle scroll, keeping the title and Done in view */
+  max-height: calc(100dvh - 32px);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  border-radius: 12px;
+  padding: 0;
+  box-shadow: 0 10px 40px var(--shadow);
+}
+.compare .dialog::backdrop {
+  background: var(--backdrop);
+}
+.compare .dialog-title {
+  margin: 0;
+  padding: 18px 20px 0;
+  font-size: 15px;
+  font-weight: 600;
+}
+/* A column only while open, leaving the browser's own display: none for when it's closed */
+.compare .dialog[open] {
+  display: flex;
+  flex-direction: column;
+}
+.compare .dialog-body {
+  min-height: 0;
+  overflow: auto;
+  padding: 14px 20px 18px;
+}
+.compare .dialog-box {
+  width: 260px;
+  height: 280px;
+}
+/* The actions, on the right under a hairline */
+.compare .dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 12px 20px;
+  border-top: 1px solid var(--border);
+}
+/* The file numbers in a column of their own, so the names line up */
+.compare .num {
+  display: inline-block;
+  min-width: 3ch;
+  margin-right: 8px;
+  text-align: end;
+  color: var(--text-faint);
+  font-variant-numeric: tabular-nums;
+}
+/* On narrow screens (the same breakpoint as styles.css and src/menu.ts), the dialog near the top, and its lists, one
+   above the other, shorter */
+@media (max-width: 720px) {
+  .compare .dialog {
+    margin-top: 16px;
+  }
+  .compare .dialog .panels > section {
+    width: 100%;
+  }
+  .compare .dialog-box {
+    width: auto;
+    height: 200px;
+  }
+}

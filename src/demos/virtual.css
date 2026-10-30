@@ -1,0 +1,30 @@
+.virtual .list {
+  width: 320px;
+  max-width: calc(100vw - 32px);
+  height: 420px;
+  overflow: auto;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+.virtual .spacer {
+  position: relative;
+}
+.virtual .window {
+  position: absolute;
+  left: 0;
+  right: 0;
+}
+.virtual .row {
+  height: 36px;
+  box-sizing: border-box;
+  padding: 0 10px;
+  border-bottom: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.virtual .wide .row {
+  width: 760px;
+}
