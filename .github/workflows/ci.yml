@@ -10,9 +10,10 @@ on:
 permissions:
   contents: read
 
-# A newer push to a pull request cancels its checks still running
+# A newer push to a pull request cancels its checks still running. Each push to main is grouped on its own: GitHub keeps
+# only one run waiting per group, so a run of quick merges would otherwise skip the commits in between.
 concurrency:
-  group: ci-${{ github.ref }}
+  group: ci-${{ github.event_name == 'pull_request' && github.ref || github.sha }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:

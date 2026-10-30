@@ -9,8 +9,6 @@ on:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 # One deploy at a time; a newer push waits rather than cancelling one that's partway through publishing
 concurrency:
@@ -29,9 +27,13 @@ jobs:
         with:
           path: dist
 
+  # Only the deploy can publish to Pages, not the build, which runs the dependencies' install scripts
   deploy:
     needs: build
     runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
