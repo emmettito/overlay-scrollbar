@@ -1,6 +1,6 @@
 # overlay-scrollbar
 
-Overlay scrollbars for any scrollable element, in plain TypeScript with no dependencies. Scrolling stays native: the library hides the element's own scrollbars and draws thin bars over its content, which widen under the pointer and fade out when scrolling stops.
+Overlay scrollbars for any scrollable element, in plain TypeScript with no dependencies.
 
 ## Using the library
 
