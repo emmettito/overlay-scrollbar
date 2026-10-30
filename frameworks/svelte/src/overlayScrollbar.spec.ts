@@ -33,6 +33,13 @@ describe('overlayScrollbar', () => {
     expect(frame()).toBe(drawn);
   });
 
+  it('keeps the same bars when updated with the same options in another order', () => {
+    action.update?.({ force: true, autoHide: false });
+    const drawn = frame();
+    action.update?.({ autoHide: false, force: true });
+    expect(frame()).toBe(drawn);
+  });
+
   it('draws them again with new options', () => {
     action.update?.({ force: true, autoHide: false });
     expect(document.querySelectorAll('.overlay-scrollbar-frame')).toHaveLength(1);

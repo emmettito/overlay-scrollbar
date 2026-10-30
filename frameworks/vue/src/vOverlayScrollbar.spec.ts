@@ -44,6 +44,15 @@ describe('vOverlayScrollbar', () => {
     expect(frame()).toBe(drawn);
   });
 
+  it('keeps the same bars when given the same options in another order', async () => {
+    options.value = { force: true, autoHide: false };
+    await nextTick();
+    const drawn = frame();
+    options.value = { autoHide: false, force: true };
+    await nextTick();
+    expect(frame()).toBe(drawn);
+  });
+
   it('draws them again when the options change', async () => {
     options.value = { force: true, autoHide: false };
     await nextTick();

@@ -4,9 +4,10 @@ import { attachOverlayScrollbar, type OverlayScrollbarOptions } from '@emmettito
 /** Overlay scrollbars on any scrollable element: `<div overlayScrollbar>` or `<div [overlayScrollbar]="options">`. */
 @Directive({ selector: '[overlayScrollbar]' })
 export class OverlayScrollbarDirective {
-  // Compared by value, so options rebuilt with the same values don't re-attach the bars
+  // Compared by value, in any key order, so options rebuilt with the same values don't re-attach the bars. Declared
+  // before the input it reads (private members come first), which is fine as a computed reads it only when it's used.
   private readonly attachOptions = computed(() => this.options(), {
-    equal: (a, b) => JSON.stringify(a) === JSON.stringify(b)
+    equal: (a, b) => JSON.stringify(a, Object.keys(a).sort()) === JSON.stringify(b, Object.keys(b).sort())
   });
   public readonly options = input(
     {},

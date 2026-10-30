@@ -48,6 +48,13 @@ describe('useOverlayScrollbar', () => {
     expect(frame()).toBe(drawn);
   });
 
+  it('keeps the same bars when re-rendered with the same options in another order', async () => {
+    await render({ force: true, autoHide: false });
+    const drawn = frame();
+    await render({ autoHide: false, force: true });
+    expect(frame()).toBe(drawn);
+  });
+
   it('draws them again when the options change', async () => {
     await render({ force: true });
     await render({ force: true, autoHide: false });

@@ -43,6 +43,17 @@ describe('OverlayScrollbarDirective', () => {
     expect(frameOf(bound())).toBe(drawn);
   });
 
+  it('keeps the same bars when given the same options in another order', async () => {
+    fixture.componentInstance.options.set({ force: true, autoHide: false });
+    fixture.detectChanges();
+    await fixture.whenStable();
+    const drawn = frameOf(bound());
+    fixture.componentInstance.options.set({ autoHide: false, force: true });
+    fixture.detectChanges();
+    await fixture.whenStable();
+    expect(frameOf(bound())).toBe(drawn);
+  });
+
   it('draws them again with new options', async () => {
     expect(frameOf(bound())?.classList).not.toContain('overlay-scrollbar-always');
 

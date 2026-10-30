@@ -160,8 +160,12 @@ for (const [name, type, env] of browsers) {
   const demoBackground = (): Promise<string> => demoList.evaluate(element => getComputedStyle(element).backgroundColor);
   const demoBefore = await demoBackground();
   await tab.click('.theme-toggle');
-  await tab.waitForTimeout(200);
-  const demoAfter = await demoBackground();
+  // The theme reaches the iframe as a message, so this waits for it to change rather than a fixed time, up to 5s
+  let demoAfter = await demoBackground();
+  for (const deadline = Date.now() + 5000; demoAfter === demoBefore && Date.now() < deadline;) {
+    await tab.waitForTimeout(50);
+    demoAfter = await demoBackground();
+  }
   if (demoBefore === demoAfter) {
     fail(`the React demo stayed ${demoBefore} when the theme changed`);
   }
