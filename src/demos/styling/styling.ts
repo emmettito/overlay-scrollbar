@@ -1,3 +1,7 @@
+// The themes' fonts, bundled like the app's own
+import '@fontsource-variable/fredoka';
+import '@fontsource-variable/orbitron';
+import '@fontsource/press-start-2p';
 import { OverlayScrollbarOptions } from '../../overlay-scrollbar/models/overlay-scrollbar-options';
 import { Bars, html, Html, Page, render } from '../page';
 import './customise/big-square.css';
@@ -7,6 +11,10 @@ import './customise/layers.css';
 import './customise/light-panel.css';
 import './customise/slow.css';
 import './styling-base.css';
+import './themes/cyberspace.css';
+import './themes/peppermint.css';
+import './themes/rainbow.css';
+import './themes/retro.css';
 
 interface Example {
   name: string;
@@ -21,7 +29,7 @@ interface Example {
 }
 
 // Each example's stylesheet, as text, keyed by path (./customise/dark-panel.css)
-const sources = import.meta.glob<string>('./customise/*.css', {
+const sources = import.meta.glob<string>(['./customise/*.css', './themes/*.css'], {
   query: '?raw',
   import: 'default',
   eager: true
@@ -86,6 +94,15 @@ const groups: { title: string; examples: Example[] }[] = [
         rows: lines
       }
     ]
+  },
+  {
+    title: 'Themes',
+    examples: [
+      { name: 'Retro', className: 'theme-retro', css: './themes/retro.css', rows: lines },
+      { name: 'Rainbow', className: 'theme-rainbow', css: './themes/rainbow.css', rows: lines },
+      { name: 'Cyberspace', className: 'theme-cyberspace', css: './themes/cyberspace.css', rows: lines },
+      { name: 'Peppermint', className: 'theme-peppermint', css: './themes/peppermint.css', rows: lines }
+    ]
   }
 ];
 
@@ -105,7 +122,7 @@ function optionsCode(options: OverlayScrollbarOptions): string {
   return `attachOverlayScrollbar(element, {\n${entries.join(',\n')}\n});`;
 }
 
-/** The custom properties and options, each with the code that makes it. */
+/** The custom properties and options, and a few themes, each with the code that makes it. */
 export const styling: Page = {
   title: 'Styling',
   render(main) {

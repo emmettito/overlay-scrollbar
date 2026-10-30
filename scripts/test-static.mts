@@ -21,7 +21,7 @@ const routes = {
   rtl: 2,
   virtual: 1,
   'drag-drop': 2,
-  styling: 9,
+  styling: 13,
   // The framework demos' bars are in their iframes, checked below
   angular: 0,
   react: 0,
@@ -113,6 +113,30 @@ for (const [name, type, env] of browsers) {
   if (thumb !== 'rgb(94, 106, 210)') {
     fail(`the Cascade layers example's thumb is ${thumb}, not the later layer's violet`);
   }
+
+  // Each theme's thumb follows the scroll, with reduced motion too: a theme that sets animation on the thumb, rather
+  // than its ::before and ::after, stops Chromium's scroll timeline moving it
+  for (const reducedMotion of ['no-preference', 'reduce'] as const) {
+    await tab.emulateMedia({ reducedMotion });
+    await tab.goto(`${page}#/styling`);
+    await tab.waitForTimeout(500);
+    const stuck = await tab.evaluate(async () => {
+      const boxes = [...document.querySelectorAll<HTMLElement>('.examples .box[class*="theme-"]')];
+      boxes.forEach(box => (box.scrollTop = box.scrollHeight));
+      await new Promise(resolve => setTimeout(resolve, 200));
+      return boxes
+        .filter(box => {
+          const bar = box.nextElementSibling?.querySelector('.overlay-scrollbar-bar-y');
+          const thumb = bar?.querySelector('.overlay-scrollbar-thumb');
+          return !bar || !thumb || thumb.getBoundingClientRect().top - bar.getBoundingClientRect().top < 20;
+        })
+        .map(box => box.className);
+    });
+    if (stuck.length) {
+      fail(`with reduced motion ${reducedMotion}, these themes' thumbs didn't follow the scroll: ${stuck.join(', ')}`);
+    }
+  }
+  await tab.emulateMedia({ reducedMotion: null });
 
   // The Dialog page: bars inside the dialog, kept open by a text selection dragged out of it, closed by a click on
   // the backdrop, and its bars gone with it

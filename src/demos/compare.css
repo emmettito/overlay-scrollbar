@@ -6,6 +6,12 @@
   border-radius: 8px;
   white-space: nowrap;
 }
+/* A list's rows all as wide as its longest, and at least the box, so their lines run on as it scrolls sideways */
+.compare .box:has(> p) {
+  display: grid;
+  grid-template-columns: minmax(max-content, auto);
+  align-content: start;
+}
 .compare .box p {
   margin: 0;
   padding: 6px 10px;
