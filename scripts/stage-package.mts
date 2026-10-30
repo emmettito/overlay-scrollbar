@@ -1,5 +1,6 @@
 // Stages the package as it's packed (by npm run package and npm run test:package): the built library, the license, the
-// README and a package.json without what only this repository uses. Packed as it is, the package.json would take its
+// library's README (src/overlay-scrollbar/README.md, as the root one is about this repository) and a package.json
+// without what only this repository uses. Packed as it is, the package.json would take its
 // scripts along, with its devDependencies and npm settings. Installing the tarball, npm 12 would warn the consumer of
 // its install scripts, "prepare" (husky) among them, though it never runs "prepare" for a tarball (only for linked and
 // git dependencies); a postinstall, say, it would run once they allowed it. Its engines are the Node this repository's
@@ -32,9 +33,8 @@ export const devOnlyFields = [
 export const stagePackage = (folder: string, npm: (args: string[], cwd: string) => string): void => {
   npm(['run', 'build:lib'], root);
   cpSync(join(root, 'lib'), join(folder, 'lib'), { recursive: true });
-  for (const file of ['LICENSE', 'README.md']) {
-    cpSync(join(root, file), join(folder, file));
-  }
+  cpSync(join(root, 'LICENSE'), join(folder, 'LICENSE'));
+  cpSync(join(root, 'src/overlay-scrollbar/README.md'), join(folder, 'README.md'));
   const manifest = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8'));
   for (const field of devOnlyFields) {
     delete manifest[field];
