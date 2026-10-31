@@ -6,9 +6,6 @@ let result: boolean | undefined;
  * CSS.supports at all (jsdom in tests) count as having it.
  */
 export function supportsAnchorPositioning(): boolean {
-  result ??=
-    typeof CSS === 'undefined' ||
-    typeof CSS.supports !== 'function' ||
-    CSS.supports('anchor-name: --overlay-scrollbar');
+  result ??= typeof CSS === 'undefined' || typeof CSS.supports !== 'function' || CSS.supports('anchor-name: --osb');
   return result;
 }

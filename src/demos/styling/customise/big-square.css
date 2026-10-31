@@ -1,7 +1,7 @@
 /* Bigger, square bars, further from the edges */
 .big-square {
-  --overlay-scrollbar-width: 10px;
-  --overlay-scrollbar-expanded-width: 16px;
-  --overlay-scrollbar-radius: 2px;
-  --overlay-scrollbar-inset: 6px;
+  --osb-width: 10px;
+  --osb-expanded-width: 16px;
+  --osb-radius: 2px;
+  --osb-inset: 6px;
 }

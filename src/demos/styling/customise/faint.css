@@ -1,4 +1,4 @@
 /* A faint thumb while not in use, so it's always clear the element scrolls */
 .faint-bars {
-  --overlay-scrollbar-idle-opacity: 0.3;
+  --osb-idle-opacity: 0.3;
 }

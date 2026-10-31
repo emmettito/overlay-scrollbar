@@ -2,9 +2,9 @@
 .light-panel {
   background: #fff;
   color: #1b1c1f;
-  --overlay-scrollbar-thumb-color: rgb(0 0 0 / 0.5);
-  --overlay-scrollbar-thumb-hover-color: rgb(0 0 0 / 0.6);
-  --overlay-scrollbar-track-color: rgb(0 0 0 / 0.047);
+  --osb-thumb-color: rgb(0 0 0 / 0.5);
+  --osb-thumb-hover-color: rgb(0 0 0 / 0.6);
+  --osb-track-color: rgb(0 0 0 / 0.047);
 }
 .light-panel p {
   border-color: #eee;

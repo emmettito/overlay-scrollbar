@@ -228,7 +228,7 @@ describe('attachOverlayScrollbar', () => {
     ref = attachOverlayScrollbar(host, { force: true });
     ref.update();
     expect(shared[frameCount]).toBe(before + 1);
-    expect(host.style.getPropertyValue('anchor-name')).toBe(`--overlay-scrollbar-frame-${before + 1}`);
+    expect(host.style.getPropertyValue('anchor-name')).toBe(`--osb-${before + 1}`);
   });
 
   it("puts back the element's own inline scrollbar-width and the stylesheet's names on destroy", () => {
@@ -240,7 +240,7 @@ describe('attachOverlayScrollbar', () => {
     ref = attachOverlayScrollbar(host, { force: true });
     ref.update();
     // The stylesheet's name is kept alongside the bars' own while they're attached
-    expect(host.style.getPropertyValue('anchor-name')).toMatch(/^--tip, --overlay-scrollbar-frame-\d+$/);
+    expect(host.style.getPropertyValue('anchor-name')).toMatch(/^--tip, --osb-\d+$/);
 
     ref.destroy();
     host.classList.remove('tooltip-anchor');
@@ -392,7 +392,7 @@ describe('attachOverlayScrollbar', () => {
     const bar = frameOf(host)?.querySelector('.overlay-scrollbar-bar-y') as HTMLElement;
     Object.defineProperty(bar, 'clientHeight', { configurable: true, value: 94 });
     ref.update();
-    expect(frameOf(host)?.style.getPropertyValue('--_overlay-scrollbar-thumb-y')).toBe('40px');
+    expect(frameOf(host)?.style.getPropertyValue('--_osb-thumb-y')).toBe('40px');
   });
 
   it('never makes the thumb longer than a track shorter than minThumbLength', () => {
@@ -400,7 +400,7 @@ describe('attachOverlayScrollbar', () => {
     const bar = frameOf(host)?.querySelector('.overlay-scrollbar-bar-y') as HTMLElement;
     Object.defineProperty(bar, 'clientHeight', { configurable: true, value: 14 });
     ref.update();
-    expect(frameOf(host)?.style.getPropertyValue('--_overlay-scrollbar-thumb-y')).toBe('14px');
+    expect(frameOf(host)?.style.getPropertyValue('--_osb-thumb-y')).toBe('14px');
   });
 
   it('ignores touch', () => {
@@ -687,15 +687,15 @@ describe('the drawn frame', () => {
     ref.update();
     Object.defineProperty(host, 'scrollHeight', { configurable: true, value: 800 });
     scrollTo(host, 10);
-    expect(frameCustomProperty(host, '--_overlay-scrollbar-thumb-y')).toBe('112.5px');
+    expect(frameCustomProperty(host, '--_osb-thumb-y')).toBe('112.5px');
 
     Object.defineProperty(host, 'scrollHeight', { configurable: true, value: 900 });
     frameOf(host)?.dispatchEvent(new PointerEvent('pointerover'));
-    expect(frameCustomProperty(host, '--_overlay-scrollbar-thumb-y')).toBe('100px');
+    expect(frameCustomProperty(host, '--_osb-thumb-y')).toBe('100px');
 
     Object.defineProperty(host, 'scrollHeight', { configurable: true, value: 300 });
     scrollTo(host, 20);
-    expect(frameCustomProperty(host, '--_overlay-scrollbar-thumb-y')).toBe('300px');
+    expect(frameCustomProperty(host, '--_osb-thumb-y')).toBe('300px');
   });
 
   it('only starts watching the children added, so a long list growing a row at a time stays cheap', async () => {
@@ -745,8 +745,8 @@ describe('the drawn frame', () => {
     const innerRef = attachOverlayScrollbar(inner, { force: true });
     ref.update();
     innerRef.update();
-    expect(frameCustomProperty(host, '--_overlay-scrollbar-depth')).toBe('0');
-    expect(frameCustomProperty(inner, '--_overlay-scrollbar-depth')).toBe('1');
+    expect(frameCustomProperty(host, '--_osb-depth')).toBe('0');
+    expect(frameCustomProperty(inner, '--_osb-depth')).toBe('1');
     innerRef.destroy();
   });
 });

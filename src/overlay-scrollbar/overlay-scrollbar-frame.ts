@@ -16,18 +16,18 @@ import { watchDirection } from './utilities/watch-direction.js';
 
 // The theming custom properties. The frame isn't inside the element to inherit any set on it, so they're copied across.
 const THEME_PROPERTIES = [
-  '--overlay-scrollbar-width',
-  '--overlay-scrollbar-expanded-width',
-  '--overlay-scrollbar-inset',
-  '--overlay-scrollbar-radius',
-  '--overlay-scrollbar-thumb-color',
-  '--overlay-scrollbar-thumb-hover-color',
-  '--overlay-scrollbar-track-color',
-  '--overlay-scrollbar-corner',
-  '--overlay-scrollbar-fade-duration',
-  '--overlay-scrollbar-fade-in-duration',
-  '--overlay-scrollbar-idle-opacity',
-  '--overlay-scrollbar-expand-duration'
+  '--osb-width',
+  '--osb-expanded-width',
+  '--osb-inset',
+  '--osb-radius',
+  '--osb-thumb-color',
+  '--osb-thumb-hover-color',
+  '--osb-track-color',
+  '--osb-corner',
+  '--osb-fade-duration',
+  '--osb-fade-in-duration',
+  '--osb-idle-opacity',
+  '--osb-expand-duration'
 ];
 
 // Each frame's anchor name is numbered from one count that every copy of the library on the page shares, through the
@@ -37,7 +37,7 @@ const frameCount = Symbol.for('@emmettito/overlay-scrollbar.frameCount');
 function nextFrameName(): string {
   const shared = globalThis as typeof globalThis & Record<symbol, number | undefined>;
   shared[frameCount] = (shared[frameCount] ?? 0) + 1;
-  return `--overlay-scrollbar-frame-${shared[frameCount]}`;
+  return `--osb-${shared[frameCount]}`;
 }
 
 // Saves an inline style property as the page set it, returning what puts it back exactly: the bars set some inline,
@@ -85,10 +85,10 @@ const parentScopes = new WeakMap<HTMLElement, { restore: () => void; children: n
  * (utilities/measure-together.ts), so elements attached together measure in two layouts.
  *
  * Sizes reach the stylesheet (overlay-scrollbar.css) as custom properties on the frame:
- * - --_overlay-scrollbar-client-width/height: the frame's size, the element's visible area
- * - --_overlay-scrollbar-border-top/left: the frame's offset from the element's border edge
- * - --_overlay-scrollbar-thumb-x/y: thumb lengths
- * - --_overlay-scrollbar-travel-x/y and --_overlay-scrollbar-timeline-x/y: how far the thumbs move, and on which
+ * - --_osb-client-width/height: the frame's size, the element's visible area
+ * - --_osb-border-top/left: the frame's offset from the element's border edge
+ * - --_osb-thumb-x/y: thumb lengths
+ * - --_osb-travel-x/y and --_osb-timeline-x/y: how far the thumbs move, and on which
  *   timelines, for Chromium's scroll-driven animations (negative x in RTL)
  * Elsewhere positionThumbs() sets each thumb's translate (and its length while rubber-banding) inline.
  */
@@ -143,8 +143,8 @@ export function drawOverlayScrollbarFrame(
   const timelines = thumbsUseScrollTimeline() && parent ? [`${name}-x`, `${name}-y`] : [];
   if (timelines.length) {
     frame.classList.add('overlay-scrollbar-scroll-timeline');
-    frame.style.setProperty('--_overlay-scrollbar-timeline-x', timelines[0]);
-    frame.style.setProperty('--_overlay-scrollbar-timeline-y', timelines[1]);
+    frame.style.setProperty('--_osb-timeline-x', timelines[0]);
+    frame.style.setProperty('--_osb-timeline-y', timelines[1]);
   }
   // The names are added in the first measurement, which reads the stylesheet's own names with the other elements'
   // reads: reading them here would restyle the page once per element attached, as each attach changes the styles
@@ -265,11 +265,11 @@ export function drawOverlayScrollbarFrame(
       barX.element.hidden = !(scrollsX && scrollWidth - clientWidth > 1);
       barY.element.hidden = !(scrollsY && scrollHeight - clientHeight > 1);
       frame.classList.toggle('overlay-scrollbar-both', !barX.element.hidden && !barY.element.hidden);
-      setCustomProperty('--_overlay-scrollbar-depth', String(depth));
-      setCustomProperty('--_overlay-scrollbar-client-width', `${clientWidth}px`);
-      setCustomProperty('--_overlay-scrollbar-client-height', `${clientHeight}px`);
-      setCustomProperty('--_overlay-scrollbar-border-top', `${borderTop}px`);
-      setCustomProperty('--_overlay-scrollbar-border-left', `${borderLeft}px`);
+      setCustomProperty('--_osb-depth', String(depth));
+      setCustomProperty('--_osb-client-width', `${clientWidth}px`);
+      setCustomProperty('--_osb-client-height', `${clientHeight}px`);
+      setCustomProperty('--_osb-border-top', `${borderTop}px`);
+      setCustomProperty('--_osb-border-left', `${borderLeft}px`);
     },
     // The stylesheet sets the track lengths from the inset and the corner gap, so they're measured. By default, both
     // bars run to the corner and overlap there; with autoHide off they leave room for each other.
@@ -288,10 +288,10 @@ export function drawOverlayScrollbarFrame(
       }
       thumbX = measureThumb(trackX, clientWidth, scrollWidth, options.minThumbLength);
       thumbY = measureThumb(trackY, clientHeight, scrollHeight, options.minThumbLength);
-      setCustomProperty('--_overlay-scrollbar-thumb-x', `${thumbX.length}px`);
-      setCustomProperty('--_overlay-scrollbar-thumb-y', `${thumbY.length}px`);
-      setCustomProperty('--_overlay-scrollbar-travel-x', `${(rtl ? -1 : 1) * thumbX.travel}px`);
-      setCustomProperty('--_overlay-scrollbar-travel-y', `${thumbY.travel}px`);
+      setCustomProperty('--_osb-thumb-x', `${thumbX.length}px`);
+      setCustomProperty('--_osb-thumb-y', `${thumbY.length}px`);
+      setCustomProperty('--_osb-travel-x', `${(rtl ? -1 : 1) * thumbX.travel}px`);
+      setCustomProperty('--_osb-travel-y', `${thumbY.travel}px`);
       positionThumbs(lastLeft, lastTop);
       if (!options.autoHide) {
         for (const bar of [barX, barY]) {

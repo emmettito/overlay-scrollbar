@@ -10,8 +10,8 @@
 }
 
 .theme-rainbow {
-  --overlay-scrollbar-width: 9px;
-  --overlay-scrollbar-expanded-width: 15px;
+  --osb-width: 9px;
+  --osb-expanded-width: 15px;
   background: linear-gradient(160deg, #fff0fa, #f1ecff 50%, #e8fbff);
   color: #8a4fa8;
   font:

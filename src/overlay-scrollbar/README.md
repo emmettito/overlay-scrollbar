@@ -63,26 +63,26 @@ Set these custom properties on the element or an ancestor. If you change them wi
 
 | Property                                | Default                                                 | Description                                                                             |
 | --------------------------------------- | ------------------------------------------------------- | --------------------------------------------------------------------------------------- |
-| `--overlay-scrollbar-width`             | `6px`                                                   | The thumb while scrolling                                                               |
-| `--overlay-scrollbar-expanded-width`    | `11px`                                                  | The track and thumb while the pointer is on the bar                                     |
-| `--overlay-scrollbar-inset`             | `3px`                                                   | The gap between the bars and the element's edges                                        |
-| `--overlay-scrollbar-radius`            | the expanded width                                      | The corners of the thumb and track                                                      |
-| `--overlay-scrollbar-thumb-color`       | `rgb(0 0 0 / 0.5)`                                      | The thumb                                                                               |
-| `--overlay-scrollbar-thumb-hover-color` | `rgb(0 0 0 / 0.6)`                                      | The thumb under the pointer, or being dragged                                           |
-| `--overlay-scrollbar-track-color`       | `rgb(0 0 0 / 0.047)`                                    | The track, shown only while the bar is expanded                                         |
-| `--overlay-scrollbar-corner`            | `0`, or room for the other bar if `autoHide` is `false` | How far each bar stops short of the corner where both show                              |
-| `--overlay-scrollbar-fade-duration`     | `0.25s`                                                 | The fade-out                                                                            |
-| `--overlay-scrollbar-fade-in-duration`  | `0.2s`                                                  | The fade-in when the pointer enters the element (`autoHide: 'leave'`)                   |
-| `--overlay-scrollbar-idle-opacity`      | `0`                                                     | The thin thumb's opacity while not in use. Around `0.3` hints that the element scrolls. |
-| `--overlay-scrollbar-expand-duration`   | `0.15s`                                                 | Widening and narrowing                                                                  |
+| `--osb-width`             | `6px`                                                   | The thumb while scrolling                                                               |
+| `--osb-expanded-width`    | `11px`                                                  | The track and thumb while the pointer is on the bar                                     |
+| `--osb-inset`             | `3px`                                                   | The gap between the bars and the element's edges                                        |
+| `--osb-radius`            | the expanded width                                      | The corners of the thumb and track                                                      |
+| `--osb-thumb-color`       | `rgb(0 0 0 / 0.5)`                                      | The thumb                                                                               |
+| `--osb-thumb-hover-color` | `rgb(0 0 0 / 0.6)`                                      | The thumb under the pointer, or being dragged                                           |
+| `--osb-track-color`       | `rgb(0 0 0 / 0.047)`                                    | The track, shown only while the bar is expanded                                         |
+| `--osb-corner`            | `0`, or room for the other bar if `autoHide` is `false` | How far each bar stops short of the corner where both show                              |
+| `--osb-fade-duration`     | `0.25s`                                                 | The fade-out                                                                            |
+| `--osb-fade-in-duration`  | `0.2s`                                                  | The fade-in when the pointer enters the element (`autoHide: 'leave'`)                   |
+| `--osb-idle-opacity`      | `0`                                                     | The thin thumb's opacity while not in use. Around `0.3` hints that the element scrolls. |
+| `--osb-expand-duration`   | `0.15s`                                                 | Widening and narrowing                                                                  |
 
 For example, light bars on a dark panel:
 
 ```css
 .dark-panel {
-  --overlay-scrollbar-thumb-color: rgb(255 255 255 / 0.5);
-  --overlay-scrollbar-thumb-hover-color: rgb(255 255 255 / 0.6);
-  --overlay-scrollbar-track-color: rgb(255 255 255 / 0.1);
+  --osb-thumb-color: rgb(255 255 255 / 0.5);
+  --osb-thumb-hover-color: rgb(255 255 255 / 0.6);
+  --osb-track-color: rgb(255 255 255 / 0.1);
 }
 ```
 

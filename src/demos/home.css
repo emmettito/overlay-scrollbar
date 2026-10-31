@@ -30,10 +30,10 @@
   --blue: blue;
   --indigo: indigo;
   --violet: violet;
-  --overlay-scrollbar-width: 16px;
-  --overlay-scrollbar-expanded-width: 16px;
-  --overlay-scrollbar-inset: 0px;
-  --overlay-scrollbar-track-color: var(--border-strong);
+  --osb-width: 16px;
+  --osb-expanded-width: 16px;
+  --osb-inset: 0px;
+  --osb-track-color: var(--border-strong);
   display: flex;
   /* Only as wide as the bars, so the wave pauses only with the pointer on them (home.ts) */
   width: fit-content;
@@ -45,35 +45,35 @@
   height: 240px;
   overflow: auto;
   /* The same colour under the pointer */
-  --overlay-scrollbar-thumb-hover-color: var(--overlay-scrollbar-thumb-color);
+  --osb-thumb-hover-color: var(--osb-thumb-color);
 }
 /* Content 1.6 times as tall, so each thumb is most of its track */
 .rainbow .scroller > div {
   height: 160%;
 }
 .rainbow .overlay-scrollbar-bar::before {
-  background-color: var(--overlay-scrollbar-track-color);
+  background-color: var(--osb-track-color);
 }
 .rainbow .red {
-  --overlay-scrollbar-thumb-color: var(--red);
+  --osb-thumb-color: var(--red);
 }
 .rainbow .orange {
-  --overlay-scrollbar-thumb-color: var(--orange);
+  --osb-thumb-color: var(--orange);
 }
 .rainbow .yellow {
-  --overlay-scrollbar-thumb-color: var(--yellow);
+  --osb-thumb-color: var(--yellow);
 }
 .rainbow .green {
-  --overlay-scrollbar-thumb-color: var(--green);
+  --osb-thumb-color: var(--green);
 }
 .rainbow .blue {
-  --overlay-scrollbar-thumb-color: var(--blue);
+  --osb-thumb-color: var(--blue);
 }
 .rainbow .indigo {
-  --overlay-scrollbar-thumb-color: var(--indigo);
+  --osb-thumb-color: var(--indigo);
 }
 .rainbow .violet {
-  --overlay-scrollbar-thumb-color: var(--violet);
+  --osb-thumb-color: var(--violet);
 }
 .docs pre {
   margin: 0 0 12px;

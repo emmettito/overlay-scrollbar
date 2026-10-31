@@ -10,13 +10,13 @@
 
 @layer defaults {
   .layered {
-    --overlay-scrollbar-thumb-color: var(--coral);
+    --osb-thumb-color: var(--coral);
   }
 }
 
 @layer brand {
   .layered {
-    --overlay-scrollbar-thumb-color: var(--violet);
-    --overlay-scrollbar-thumb-hover-color: var(--violet-dark);
+    --osb-thumb-color: var(--violet);
+    --osb-thumb-hover-color: var(--violet-dark);
   }
 }
