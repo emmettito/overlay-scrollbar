@@ -10,11 +10,12 @@ import {
   stopMeasuringOnBorderBoxResize,
   stopMeasuringOnResize
 } from './utilities/measure-together.js';
+import { sameAxes, ScrollAxes, scrollAxes } from './utilities/scroll-axes.js';
 import { measureThumb, overscroll, placeThumbOnTrack, ThumbSize } from './utilities/thumb-geometry.js';
 import { thumbsUseScrollTimeline } from './utilities/thumbs-use-scroll-timeline.js';
 import { watchDirection } from './utilities/watch-direction.js';
 
-// The theming custom properties. The frame isn't inside the element to inherit any set on it, so they're copied across.
+// The theming custom properties. The frame isn't inside the element to inherit any set on it, so those are copied across.
 const THEME_PROPERTIES = [
   '--osb-width',
   '--osb-expanded-width',
@@ -48,7 +49,7 @@ function saveInline(style: CSSStyleDeclaration, property: string): () => void {
   return () => (value ? style.setProperty(property, value, priority) : style.removeProperty(property));
 }
 
-// Adds names to a comma-separated list property (anchor-name, scroll-timeline-name, timeline-scope) set inline, keeping
+// Adds names to a comma-separated list property (anchor-name, timeline-scope) set inline, keeping
 // whatever the stylesheet already gives it. timeline-scope: all already covers every name.
 function addNames(style: CSSStyleDeclaration, property: string, computed: string, names: string[]): void {
   const existing = style.getPropertyValue(property) || (computed === 'none' ? '' : computed);
@@ -84,13 +85,19 @@ const parentScopes = new WeakMap<HTMLElement, { restore: () => void; children: n
  * parent); elsewhere the scroll listener moves them. Measuring is split into steps that only read or only write
  * (utilities/measure-together.ts), so elements attached together measure in two layouts.
  *
- * Sizes reach the stylesheet (overlay-scrollbar.css) as custom properties on the frame:
- * - --_osb-client-width/height: the frame's size, the element's visible area
- * - --_osb-border-top/left: the frame's offset from the element's border edge
+ * The anchor gives the frame the element's border box, and the frame takes the element's border widths, transparent, so
+ * the bars sit over its visible area. Sizes reach the stylesheet (overlay-scrollbar.css) as custom properties on the
+ * frame, each only where it's needed:
+ * - --_osb-depth: how many attached elements this one is nested in, unless none
  * - --_osb-thumb-x/y: thumb lengths
  * - --_osb-travel-x/y and --_osb-timeline-x/y: how far the thumbs move, and on which
- *   timelines, for Chromium's scroll-driven animations (negative x in RTL)
+ *   timelines, for Chromium's scroll-driven animations (negative on an axis that scrolls from 0 down, see below)
  * Elsewhere positionThumbs() sets each thumb's translate (and its length while rubber-banding) inline.
+ *
+ * Which way each axis scrolls follows the element's writing mode and direction (utilities/scroll-axes.ts): the
+ * content starts on the right in RTL and in vertical-rl text, where scrollLeft runs from 0 down, and at the bottom where
+ * a vertical line runs upwards, where scrollTop does. The frame's classes put each thumb's start there, and the
+ * vertical bar on the left in RTL.
  */
 export function drawOverlayScrollbarFrame(
   host: HTMLElement,
@@ -104,7 +111,10 @@ export function drawOverlayScrollbarFrame(
   frame.style.setProperty('position-anchor', name);
   // What the last measurement read. Copied out of the computed style, which is live: reading it after another
   // element's writes would restyle the page.
-  let direction = '';
+  let axes: ScrollAxes = scrollAxes('', '');
+  // The element's colour scheme, and the same again only where it isn't what the frame inherits from its parent
+  let colorScheme = '';
+  let ownColorScheme = '';
   let theme: string[] = [];
   let scrollsX = false;
   let scrollsY = false;
@@ -113,13 +123,12 @@ export function drawOverlayScrollbarFrame(
   let scrollHeight = 0;
   let clientWidth = 0;
   let clientHeight = 0;
-  let borderTop = 0;
-  let borderLeft = 0;
+  let borderWidth = '';
+  let frameBorderWidth = '';
   let trackX = 0;
   let trackY = 0;
   let thumbX: ThumbSize = { length: 0, travel: 0 };
   let thumbY: ThumbSize = { length: 0, travel: 0 };
-  let rtl = false;
   let lastLeft = 0;
   let lastTop = 0;
   const barX = new OverlayScrollbarBar(
@@ -127,14 +136,14 @@ export function drawOverlayScrollbarFrame(
     false,
     options,
     () => thumbX.travel,
-    () => rtl
+    () => axes.reverseX
   );
   const barY = new OverlayScrollbarBar(
     host,
     true,
     options,
     () => thumbY.travel,
-    () => rtl
+    () => axes.reverseY
   );
   frame.append(barY.element, barX.element);
 
@@ -169,16 +178,17 @@ export function drawOverlayScrollbarFrame(
     );
     addNames(host.style, 'anchor-name', anchorNames, [name]);
     if (parent && timelines.length) {
-      addNames(host.style, 'scroll-timeline-name', timelineNames, timelines);
-      // One axis per name, in step with the names: the stylesheet's own timelines keep theirs
-      const ownAxes = host.style.getPropertyValue('scroll-timeline-name').split(',').length - timelines.length;
-      const pageAxes = timelineAxes.split(',');
+      // As one shorthand, each name with its axis: the stylesheet's own timelines keep theirs, its axes repeating to
+      // match its names, as CSS does when it lists fewer axes than names
+      const pageNames = timelineNames === 'none' ? [] : timelineNames.split(',').map(name => name.trim());
+      const pageAxes = timelineAxes.split(',').map(axis => axis.trim());
       host.style.setProperty(
-        'scroll-timeline-axis',
-        // The stylesheet's axes repeat to match its names, as CSS does when it lists fewer axes than names
-        [...Array.from({ length: ownAxes }, (_, i) => pageAxes[i % pageAxes.length]), 'x', 'y']
-          .map(axis => axis.trim())
-          .join(', ')
+        'scroll-timeline',
+        [
+          ...pageNames.map((name, i) => `${name} ${pageAxes[i % pageAxes.length]}`),
+          `${timelines[0]} x`,
+          `${timelines[1]} y`
+        ].join(', ')
       );
       const scope = parentScopes.get(parent) ?? { restore: saveInline(parent.style, 'timeline-scope'), children: 0 };
       scope.children++;
@@ -186,18 +196,23 @@ export function drawOverlayScrollbarFrame(
       addNames(parent.style, 'timeline-scope', timelineScope, timelines);
     }
   };
-  const restoreScrollbarWidth = saveInline(host.style, 'scrollbar-width');
-  host.style.setProperty('scrollbar-width', 'none');
   host.classList.add('overlay-scrollbar-host');
   host.after(frame);
 
+  // Sets a custom property on the frame, or removes it for an empty value
   const customProperties = new Map<string, string>();
   const setCustomProperty = (property: string, value: string): void => {
-    if (customProperties.get(property) !== value) {
+    if (!value) {
+      if (customProperties.delete(property)) {
+        frame.style.removeProperty(property);
+      }
+    } else if (customProperties.get(property) !== value) {
       customProperties.set(property, value);
       frame.style.setProperty(property, value);
     }
   };
+  // Lengths to a hundredth of a pixel, finer than any screen shows
+  const px = (length: number): string => `${Math.round(length * 100) / 100}px`;
   const canScroll = (overflow: string): boolean => overflow === 'auto' || overflow === 'scroll';
 
   // With autoHide 'leave': whether the pointer is on the element, and holding the bars there
@@ -221,9 +236,15 @@ export function drawOverlayScrollbarFrame(
       if (!named) {
         readNames(style);
       }
-      direction = style.direction;
-      rtl = direction === 'rtl';
-      theme = THEME_PROPERTIES.map(property => style.getPropertyValue(property));
+      axes = scrollAxes(style.writingMode, style.direction);
+      colorScheme = style.colorScheme;
+      const parentStyle = frame.parentElement && getComputedStyle(frame.parentElement);
+      ownColorScheme = colorScheme === parentStyle?.colorScheme ? '' : colorScheme;
+      // initial where the element undoes its parent's (e.g. with initial itself), as the frame would inherit it
+      theme = THEME_PROPERTIES.map(property => {
+        const value = style.getPropertyValue(property);
+        return value === (parentStyle?.getPropertyValue(property) ?? '') ? '' : value || 'initial';
+      });
       scrollsX = canScroll(style.overflowX);
       scrollsY = canScroll(style.overflowY);
       // A nested scroller's bars go above those of the scrollers around it, which come later in the document and would
@@ -241,9 +262,10 @@ export function drawOverlayScrollbarFrame(
       scrollHeight = host.scrollHeight;
       clientWidth = host.clientWidth;
       clientHeight = host.clientHeight;
-      // The borders: the native scrollbars are hidden, so none sits on the left in RTL
-      borderTop = host.clientTop;
-      borderLeft = host.clientLeft;
+      // The borders, unless there are none
+      borderWidth = [style.borderTopWidth, style.borderRightWidth, style.borderBottomWidth, style.borderLeftWidth]
+        .join(' ')
+        .replace(/^0px 0px 0px 0px$/, '');
     },
     apply(): void {
       if (destroyed) {
@@ -252,24 +274,30 @@ export function drawOverlayScrollbarFrame(
       if (!named) {
         addAllNames();
       }
-      // The frame takes the element's direction and theme, which it doesn't inherit from it
-      frame.style.direction = direction;
-      THEME_PROPERTIES.forEach((property, index) => {
-        const value = theme[index];
-        if (value) {
-          setCustomProperty(property, value);
-        } else if (customProperties.delete(property)) {
-          frame.style.removeProperty(property);
-        }
-      });
+      // The frame takes the element's axes, colour scheme (for the default colours' light-dark()) and theme, which it
+      // doesn't inherit from it. The colour scheme and theme only where the element's differ from its parent's: usually
+      // they're the page's, which the frame inherits as they change (e.g. a dark theme switched on), with nothing to
+      // measure.
+      if (frame.style.colorScheme !== ownColorScheme) {
+        frame.style.colorScheme = ownColorScheme;
+      }
+      frame.classList.toggle('overlay-scrollbar-reverse-x', axes.reverseX);
+      frame.classList.toggle('overlay-scrollbar-reverse-y', axes.reverseY);
+      frame.classList.toggle('overlay-scrollbar-bar-y-left', axes.barYLeft);
+      THEME_PROPERTIES.forEach((property, index) => setCustomProperty(property, theme[index]));
       barX.element.hidden = !(scrollsX && scrollWidth - clientWidth > 1);
       barY.element.hidden = !(scrollsY && scrollHeight - clientHeight > 1);
       frame.classList.toggle('overlay-scrollbar-both', !barX.element.hidden && !barY.element.hidden);
-      setCustomProperty('--_osb-depth', String(depth));
-      setCustomProperty('--_osb-client-width', `${clientWidth}px`);
-      setCustomProperty('--_osb-client-height', `${clientHeight}px`);
-      setCustomProperty('--_osb-border-top', `${borderTop}px`);
-      setCustomProperty('--_osb-border-left', `${borderLeft}px`);
+      setCustomProperty('--_osb-depth', depth ? String(depth) : '');
+      // Inline, style and colour too, so no page style (e.g. a reset's border: 0 solid, which makes it currentColor) can
+      // paint it over the element's own. Compared with what was last set: the frame's style shortens four equal widths
+      // to one.
+      if (borderWidth !== frameBorderWidth) {
+        frameBorderWidth = borderWidth;
+        frame.style.borderWidth = borderWidth;
+        frame.style.borderStyle = borderWidth && 'solid';
+        frame.style.borderColor = borderWidth && 'transparent';
+      }
     },
     // The stylesheet sets the track lengths from the inset and the corner gap, so they're measured. By default, both
     // bars run to the corner and overlap there; with autoHide off they leave room for each other.
@@ -288,10 +316,12 @@ export function drawOverlayScrollbarFrame(
       }
       thumbX = measureThumb(trackX, clientWidth, scrollWidth, options.minThumbLength);
       thumbY = measureThumb(trackY, clientHeight, scrollHeight, options.minThumbLength);
-      setCustomProperty('--_osb-thumb-x', `${thumbX.length}px`);
-      setCustomProperty('--_osb-thumb-y', `${thumbY.length}px`);
-      setCustomProperty('--_osb-travel-x', `${(rtl ? -1 : 1) * thumbX.travel}px`);
-      setCustomProperty('--_osb-travel-y', `${thumbY.travel}px`);
+      setCustomProperty('--_osb-thumb-x', px(thumbX.length));
+      setCustomProperty('--_osb-thumb-y', px(thumbY.length));
+      if (timelines.length) {
+        setCustomProperty('--_osb-travel-x', px((axes.reverseX ? -1 : 1) * thumbX.travel));
+        setCustomProperty('--_osb-travel-y', px((axes.reverseY ? -1 : 1) * thumbY.travel));
+      }
       positionThumbs(lastLeft, lastTop);
       if (!options.autoHide) {
         for (const bar of [barX, barY]) {
@@ -308,7 +338,13 @@ export function drawOverlayScrollbarFrame(
   const update = (): void => measureTogether([measurement]);
 
   // The thumb shortens while rubber-banding, which needs a scroll position past the ends. Only Safari reports one.
-  const placeThumb = (bar: OverlayScrollbarBar, vertical: boolean, position: number, maxScroll: number): void => {
+  const placeThumb = (
+    bar: OverlayScrollbarBar,
+    vertical: boolean,
+    reverse: boolean,
+    position: number,
+    maxScroll: number
+  ): void => {
     const overscrollDistance = overscroll(position, maxScroll);
     const { length, offset } = placeThumbOnTrack(
       position,
@@ -320,7 +356,8 @@ export function drawOverlayScrollbarFrame(
       options.minThumbLength
     );
     bar.thumb.style[vertical ? 'height' : 'width'] = overscrollDistance ? `${length}px` : '';
-    bar.thumb.style.translate = vertical ? `0 ${offset}px` : `${(rtl ? -1 : 1) * offset}px 0`;
+    const translate = (reverse ? -1 : 1) * offset;
+    bar.thumb.style.translate = vertical ? `0 ${translate}px` : `${translate}px 0`;
   };
 
   // Only writes, from the scroll position and the last measurement
@@ -328,17 +365,24 @@ export function drawOverlayScrollbarFrame(
     if (timelines.length) {
       return;
     }
-    // Distance from the start, also in RTL, where scrollLeft runs from 0 down to -maxLeft
-    placeThumb(barX, false, rtl ? -left : left, Math.max(0, scrollWidth - clientWidth));
-    placeThumb(barY, true, top, Math.max(0, scrollHeight - clientHeight));
+    // Distance from the start, also where the axis scrolls from 0 down to minus the range
+    placeThumb(barX, false, axes.reverseX, axes.reverseX ? -left : left, Math.max(0, scrollWidth - clientWidth));
+    placeThumb(barY, true, axes.reverseY, axes.reverseY ? -top : top, Math.max(0, scrollHeight - clientHeight));
   };
 
-  // Re-measures what no ResizeObserver sees, whenever the bars are about to show: the direction changing (e.g.
-  // switching to a right-to-left language), and content changing size deeper down than the element's children (e.g.
-  // rows widening inside a virtual list's wrapper)
+  // Re-measures what no ResizeObserver sees, whenever the bars are about to show: the direction, writing mode or colour
+  // scheme changing (e.g. switching to a right-to-left language), and content changing size deeper down than the
+  // element's children (e.g. rows widening inside a virtual list's wrapper). The frame's own colour scheme and theme are
+  // checked against the element's: the element's changing, or the frame inheriting where the element's matched the
+  // page's, which may be the element's own and stay when the page's changes (a light panel on a page switched to dark).
   const updateIfStale = (): void => {
+    const style = getComputedStyle(host);
+    const frameStyle = getComputedStyle(frame);
     if (
-      (getComputedStyle(host).direction === 'rtl') !== rtl ||
+      !sameAxes(scrollAxes(style.writingMode, style.direction), axes) ||
+      style.colorScheme !== colorScheme ||
+      frameStyle.colorScheme !== style.colorScheme ||
+      THEME_PROPERTIES.some(property => frameStyle.getPropertyValue(property) !== style.getPropertyValue(property)) ||
       host.scrollWidth !== scrollWidth ||
       host.scrollHeight !== scrollHeight
     ) {
@@ -462,7 +506,6 @@ export function drawOverlayScrollbarFrame(
       unwatchDirection();
       frame.remove();
       host.classList.remove('overlay-scrollbar-host');
-      restoreScrollbarWidth();
       if (!named) {
         return;
       }

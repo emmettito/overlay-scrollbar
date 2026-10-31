@@ -30,6 +30,10 @@ describe('pageTowards', () => {
     host = createHost();
   });
 
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
   it('pages down or up towards the click, keeping 10px of the last page in view', () => {
     const thumb = rect(40, 20, true);
     pageTowards(host, true, 80, thumb);
@@ -46,6 +50,13 @@ describe('pageTowards', () => {
   it('pages sideways on the horizontal bar', () => {
     pageTowards(host, false, 150, rect(20, 40, false));
     expect(host.scrollBy).toHaveBeenLastCalledWith({ left: 190, behavior: 'smooth' });
+  });
+
+  it('pages instantly for users who prefer reduced motion', () => {
+    vi.spyOn(window, 'matchMedia').mockReturnValue({ matches: true } as MediaQueryList);
+    pageTowards(host, true, 80, rect(40, 20, true));
+    expect(window.matchMedia).toHaveBeenCalledWith('(prefers-reduced-motion: reduce)');
+    expect(host.scrollBy).toHaveBeenLastCalledWith({ top: 90, behavior: 'instant' });
   });
 
   it('pages at least 1px in a box smaller than the overlap', () => {
@@ -97,6 +108,12 @@ describe('jumpToSpot', () => {
     // The thumb's centre 50px from the right puts its start 30px in: 30/160 of the way
     jumpToSpot(host, false, true, 150, rect(0, 200, false), rect(160, 40, false), 160);
     expect(host.scrollLeft).toBe(-75);
+  });
+
+  it('measures from the bottom where vertical lines run upwards, and scrollTop runs negative', () => {
+    // The thumb's centre 30px from the bottom puts its start 20px up: 20/80 of the way
+    jumpToSpot(host, true, true, 70, rect(0, 100, true), rect(80, 20, true), 80);
+    expect(host.scrollTop).toBe(-100);
   });
 
   it('goes to the start rather than dividing by zero when the thumb has no travel', () => {

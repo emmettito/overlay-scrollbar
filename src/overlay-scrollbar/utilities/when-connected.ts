@@ -1,5 +1,6 @@
-// The elements waiting, held weakly: one dropped without being destroyed can be garbage collected, rather than kept
-// (and checked every frame) for good. Each one's callback is kept only as long as the element itself.
+// The elements waiting, held weakly, so waiting doesn't itself keep one from being garbage collected. Each one's
+// callback is kept only as long as the element itself. The bars usually keep it anyway until they're destroyed (e.g.
+// through watchScrollbarStyle's listeners), so one dropped without destroy() is kept, and checked every frame, for good.
 const waiting = new Set<WeakRef<Element>>();
 const waitingFor = new WeakMap<Element, { ref: WeakRef<Element>; callback: () => void }>();
 let observer: MutationObserver | undefined;

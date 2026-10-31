@@ -2,6 +2,10 @@ import { ResolvedOverlayScrollbarOptions } from './models/overlay-scrollbar-opti
 import { jumpToSpot, pageTowards } from './utilities/track-click.js';
 import { withoutTransitions } from './utilities/without-transitions.js';
 
+// On a Mac, Control-click is a right-click: it opens the context menu, though it comes with the main button. Read at
+// each press rather than once, so the specs can stand in for a Mac.
+const controlClickIsRightClick = (): boolean => /^Mac/.test(navigator.platform);
+
 /** One scrollbar: its show/hide timing, hover expansion and pointer handling (thumb drag, track clicks). */
 export class OverlayScrollbarBar {
   private dragging = false;
@@ -17,15 +21,16 @@ export class OverlayScrollbarBar {
   public readonly thumb = document.createElement('div');
 
   /**
-   * `getTravel` and `isRtl` are read when the pointer goes down, not passed as values, because the frame re-measures
-   * them whenever the element resizes or changes direction.
+   * `getTravel` and `isReversed` (whether the bar's axis scrolls from 0 down, see utilities/scroll-axes.ts) are read
+   * as the pointer uses them, not passed as values, because the frame re-measures them whenever the element or its
+   * content resizes, or it changes direction or writing mode.
    */
   constructor(
     private host: HTMLElement,
     private vertical: boolean,
     private options: ResolvedOverlayScrollbarOptions,
     private getTravel: () => number,
-    private isRtl: () => boolean
+    private isReversed: () => boolean
   ) {
     this.element.className = `overlay-scrollbar-bar overlay-scrollbar-bar-${vertical ? 'y' : 'x'}`;
     this.element.hidden = true;
@@ -34,6 +39,7 @@ export class OverlayScrollbarBar {
     this.element.addEventListener('pointerenter', this.onPointerEnter);
     this.element.addEventListener('pointerleave', this.onPointerLeave);
     this.element.addEventListener('pointerdown', this.onPointerDown);
+    this.element.addEventListener('contextmenu', this.onContextMenu);
   }
 
   public destroy(): void {
@@ -108,18 +114,22 @@ export class OverlayScrollbarBar {
 
   private drag(downEvent: PointerEvent, pointerPosition: (event: PointerEvent) => number): void {
     const scrollProperty = this.vertical ? 'scrollTop' : 'scrollLeft';
-    const maxScroll = this.vertical
-      ? this.host.scrollHeight - this.host.clientHeight
-      : this.host.scrollWidth - this.host.clientWidth;
     this.dragging = true;
     this.element.classList.add('overlay-scrollbar-dragging');
     this.thumb.setPointerCapture(downEvent.pointerId);
     const startPosition = pointerPosition(downEvent);
     const startScroll = this.host[scrollProperty];
-    const travel = this.getTravel();
     // Only the pointer that started the drag moves it: a second finger or a pen on the bar meanwhile is ignored
     const move = (moveEvent: PointerEvent): void => {
-      if (moveEvent.pointerId === downEvent.pointerId && travel > 0) {
+      if (moveEvent.pointerId !== downEvent.pointerId) {
+        return;
+      }
+      // Measured on each move, not once, as content loading during the drag (e.g. an endless list) changes both
+      const maxScroll = this.vertical
+        ? this.host.scrollHeight - this.host.clientHeight
+        : this.host.scrollWidth - this.host.clientWidth;
+      const travel = this.getTravel();
+      if (travel > 0) {
         // Instant, as the thumb has to keep up with the pointer: scroll-behavior: smooth on the element would
         // otherwise start an animation on every move
         this.host.scrollTo({
@@ -164,9 +174,15 @@ export class OverlayScrollbarBar {
     this.element.classList.remove('overlay-scrollbar-visible', 'overlay-scrollbar-fade-in');
   }
 
+  // No context menu, as over native scrollbars: the page's would otherwise open over the bar
+  private onContextMenu = (event: MouseEvent): void => {
+    event.preventDefault();
+  };
+
   private onPointerDown = (event: PointerEvent): void => {
-    // A second pointer during a drag neither pages nor starts another drag
-    if (event.button !== 0 || this.dragging) {
+    // Only the main button, and not a Mac's Control-click, which is a right-click. A second pointer during a drag
+    // neither pages nor starts another drag.
+    if (event.button !== 0 || (event.ctrlKey && controlClickIsRightClick()) || this.dragging) {
       return;
     }
     event.preventDefault();
@@ -182,7 +198,7 @@ export class OverlayScrollbarBar {
         jumpToSpot(
           this.host,
           this.vertical,
-          this.isRtl(),
+          this.isReversed(),
           pointerPosition(event),
           trackRect,
           thumbRect,
