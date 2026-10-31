@@ -1,6 +1,6 @@
 {
   "name": "@emmettito/overlay-scrollbar",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Overlay scrollbars for any scrollable element, in plain TypeScript with no dependencies",
   "license": "MIT",
   "homepage": "https://emmettito.github.io/overlay-scrollbar/",
