@@ -1,13 +1,8 @@
-import '@emmettito/overlay-scrollbar/overlay-scrollbar.css';
-import { mount } from 'svelte';
-import '../../shared/demo.css';
-import { followAppTheme } from '../../shared/theme';
+import { mount, unmount } from 'svelte';
+import { defineDemo } from '../../shared/define-demo';
 import App from './App.svelte';
 
-followAppTheme();
-
-const app = document.getElementById('app');
-if (!app) {
-  throw new Error('No #app element to mount into');
-}
-mount(App, { target: app });
+defineDemo('svelte-demo', host => {
+  const app = mount(App, { target: host });
+  return () => void unmount(app);
+});

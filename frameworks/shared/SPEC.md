@@ -31,7 +31,11 @@ same markup, same class names, same behaviour, styled by `demo.css` in this fold
   - Vue: a directive, `v-overlay-scrollbar="options"`
   - Svelte: an action, `use:overlayScrollbar={options}`
 - Each imports the library by its package name, `@emmettito/overlay-scrollbar` (pointed at `src/overlay-scrollbar` by
-  the demo's Vite and TypeScript configs), and its stylesheet as `@emmettito/overlay-scrollbar/overlay-scrollbar.css`,
-  as an app would.
+  the demo's Vite and TypeScript configs), as an app would. The library's stylesheet and `demo.css` are the app's,
+  which the demo is part of.
+- Each `src/main.*` defines an element, `<angular-demo>`, `<react-demo>`, `<vue-demo>` or `<svelte-demo>`, with
+  `defineDemo` (`define-demo.ts` in this folder): it mounts the framework's app in the element when the element is
+  added to the page, and unmounts it when the element is removed. Each builds into one classic script,
+  `public/frameworks/<name>/demo.js`, which the framework's page in the app loads (`src/demos/framework-page.ts`).
 - Each wrapper has a spec next to it covering those three: drawing on mount, drawing again only when the options
   change, and removing the bars on unmount.

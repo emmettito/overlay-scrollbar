@@ -1,9 +1,9 @@
-import '@emmettito/overlay-scrollbar/overlay-scrollbar.css';
 import { createApp } from 'vue';
-import '../../shared/demo.css';
-import { followAppTheme } from '../../shared/theme';
+import { defineDemo } from '../../shared/define-demo';
 import App from './App.vue';
 
-followAppTheme();
-
-createApp(App).mount('#app');
+defineDemo('vue-demo', host => {
+  const app = createApp(App);
+  app.mount(host);
+  return () => app.unmount();
+});

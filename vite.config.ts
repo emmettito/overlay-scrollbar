@@ -5,7 +5,8 @@ const frameworks = ['angular', 'react', 'vue', 'svelte'];
 
 /**
  * In dev, serves each framework demo from a Vite dev server of its own (each needs its framework's plugin), at
- * frameworks/<name>/ where the build puts it, so they update as you edit them, with no `npm run frameworks`.
+ * frameworks/<name>/ where the build puts it: the framework's page loads its entry from there as a module
+ * (src/demos/framework-page.ts), so the demos update as you edit them, with no `npm run frameworks`.
  */
 function frameworkDemos(): Plugin {
   return {
@@ -41,10 +42,14 @@ function frameworkDemos(): Plugin {
       server.httpServer?.on('close', () => demos.forEach(({ demo }) => demo.close()));
     },
     // The app imports the demos' files only as text, for the code panels (?raw), which would reload the whole page and
-    // the demo with it: leaves their updates to the demos' own servers, and the panels to the next reload
+    // the demo with it: leaves their updates to the demos' own servers, and the panels to the next reload. The demo's
+    // stylesheet, in frameworks/shared/, is the app's own, and updates as the app's do.
     hotUpdate({ file }) {
       // Vite gives paths with forward slashes, also on Windows
-      if (file.startsWith(normalizePath(fileURLToPath(new URL('frameworks/', import.meta.url))))) {
+      const folders = frameworks.map(name =>
+        normalizePath(fileURLToPath(new URL(`frameworks/${name}/`, import.meta.url)))
+      );
+      if (folders.some(folder => file.startsWith(folder))) {
         return [];
       }
     }

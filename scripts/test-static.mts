@@ -23,7 +23,7 @@ const routes = {
   virtual: 1,
   'drag-drop': 2,
   styling: 26,
-  // The code panels'; the framework demos' own bars are in their iframes, checked below
+  // The code panels'; the framework demos' own bars are checked below
   angular: 2,
   react: 2,
   vue: 2,
@@ -61,7 +61,9 @@ for (const [name, type, env] of browsers) {
   for (const [route, bars] of Object.entries(routes)) {
     await tab.goto(`${page}#/${route}`);
     await tab.waitForTimeout(500);
-    const drawn = await tab.evaluate(() => document.querySelectorAll('main .overlay-scrollbar-frame').length);
+    const drawn = await tab.evaluate(
+      () => document.querySelectorAll('main .overlay-scrollbar-frame:not(.demo *)').length
+    );
     if (!(await tab.locator('main h1').count())) {
       fail(`#/${route} rendered nothing`);
     } else if (drawn !== bars) {
@@ -80,10 +82,10 @@ for (const [name, type, env] of browsers) {
     fail(`only ${appBars.join(' and ') || 'nothing'} of main and the nav's links has bars`);
   }
 
-  // Each framework demo, in its iframe: its list has bars, and adding items updates it
+  // Each framework demo, its element defined by its own script: its list has bars, and adding items updates it
   for (const framework of ['angular', 'react', 'vue', 'svelte']) {
     await tab.goto(`${page}#/${framework}`);
-    const demo = tab.frameLocator('iframe');
+    const demo = tab.locator(`${framework}-demo`);
     await demo
       .locator('.list')
       .waitFor({ timeout: 5000 })
@@ -181,20 +183,16 @@ for (const [name, type, env] of browsers) {
     fail(`the theme toggle went from ${JSON.stringify(before)} to ${JSON.stringify(after)}`);
   }
 
-  // A framework demo's theme follows the app's, which its iframe is told rather than left to its color-scheme
+  // A framework demo's thumbs follow the app's theme as it switches, though its wrapper doesn't measure them again: the
+  // bars inherit the app's theme rather than copying it
   await tab.goto(`${page}#/react`);
-  const demoList = tab.frameLocator('iframe').locator('.list');
-  const demoBackground = (): Promise<string> => demoList.evaluate(element => getComputedStyle(element).backgroundColor);
-  const demoBefore = await demoBackground();
+  const demoThumb = tab.locator('react-demo .list + .overlay-scrollbar-frame .overlay-scrollbar-thumb').first();
+  const thumbColor = (): Promise<string> => demoThumb.evaluate(element => getComputedStyle(element).backgroundColor);
+  const demoBefore = await thumbColor();
   await tab.click('.theme-toggle');
-  // The theme reaches the iframe as a message, so this waits for it to change rather than a fixed time, up to 5s
-  let demoAfter = await demoBackground();
-  for (const deadline = Date.now() + 5000; demoAfter === demoBefore && Date.now() < deadline;) {
-    await tab.waitForTimeout(50);
-    demoAfter = await demoBackground();
-  }
+  const demoAfter = await thumbColor();
   if (demoBefore === demoAfter) {
-    fail(`the React demo stayed ${demoBefore} when the theme changed`);
+    fail(`the React demo's thumb stayed ${demoBefore} when the theme switched`);
   }
 
   // Unknown routes, including ones named like Object's own properties, go home

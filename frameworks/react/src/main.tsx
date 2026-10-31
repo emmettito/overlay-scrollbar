@@ -1,13 +1,12 @@
-import '@emmettito/overlay-scrollbar/overlay-scrollbar.css';
+// In dev, sets up fast refresh before any component loads, as there's no HTML page for the plugin to do it in. Empty
+// in the build.
+import '@vitejs/plugin-react/preamble';
 import { createRoot } from 'react-dom/client';
-import '../../shared/demo.css';
-import { followAppTheme } from '../../shared/theme';
+import { defineDemo } from '../../shared/define-demo';
 import { App } from './App';
 
-followAppTheme();
-
-const app = document.getElementById('app');
-if (!app) {
-  throw new Error('No #app element to render into');
-}
-createRoot(app).render(<App />);
+defineDemo('react-demo', host => {
+  const root = createRoot(host);
+  root.render(<App />);
+  return () => root.unmount();
+});
