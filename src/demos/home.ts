@@ -1,5 +1,5 @@
 import { supportsAnchorPositioning } from '../overlay-scrollbar/utilities/anchor-positioning';
-import { drawsOverlayScrollbars } from '../overlay-scrollbar/utilities/scrollbar-style';
+import { drawsOverlayScrollbars, watchScrollbarStyle } from '../overlay-scrollbar/utilities/scrollbar-style';
 import './home.css';
 import { Bars, find, html, Page, render } from './page';
 
@@ -37,9 +37,9 @@ function notice(): string | undefined {
   }
   if (!drawsOverlayScrollbars()) {
     return (
-      'By default, the library leaves the native scrollbars alone on a touch-only device; its force option draws ' +
-      'its bars there too. The boxes’ bars here and in the demos are forced on, to show them; the code blocks keep ' +
-      'the default.'
+      'This device is touch-only, so by default the library leaves its native scrollbars alone; its force option ' +
+      'draws its bars here too. The boxes’ bars here and in the demos are forced on, to show them. The code blocks ' +
+      'keep the default, and switch to the library’s bars when you connect a mouse or trackpad.'
     );
   }
   return undefined;
@@ -49,13 +49,12 @@ function notice(): string | undefined {
 export const home: Page = {
   title: 'overlay-scrollbar',
   render(main) {
-    const why = notice();
     render(
       main,
       html`
       <article class="docs">
         <h1>overlay-scrollbar</h1>
-        ${why && html`<p class="notice">${why}</p>`}
+        <p class="notice" hidden></p>
 
         <div class="rainbow">
           ${rainbow.map(color => html`<div class="scroller ${color}"><div></div></div>`)}
@@ -68,6 +67,16 @@ export const home: Page = {
       </article>
     `
     );
+
+    // Kept up to date, as connecting a mouse or trackpad, or disconnecting it, changes whether the library draws its bars
+    const noticeElement = find(main, '.notice');
+    const showNotice = (): void => {
+      const why = notice();
+      noticeElement.hidden = !why;
+      noticeElement.textContent = why ?? '';
+    };
+    showNotice();
+    const unwatch = watchScrollbarStyle(showNotice);
 
     const bars = new Bars();
     const scrollers = rainbow.map(color => find(main, `.rainbow .${color}`));
@@ -102,6 +111,7 @@ export const home: Page = {
       frame = requestAnimationFrame(step);
     }
     return () => {
+      unwatch();
       cancelAnimationFrame(frame);
       bars.destroy();
     };

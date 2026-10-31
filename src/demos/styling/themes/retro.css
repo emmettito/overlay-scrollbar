@@ -13,7 +13,7 @@
 .theme-retro {
   --osb-width: 16px;
   --osb-expanded-width: 22px;
-  --osb-inset: 4px;
+  --osb-inset: 6px; /* Room for the thumb's 2px outline inside the box's rounded corners */
   --osb-radius: 0;
   --osb-expand-duration: 0s; /* Pixel art snaps */
   background: #5c94fc linear-gradient(transparent calc(100% - 24px), #c84c0c calc(100% - 24px));
@@ -27,10 +27,19 @@
 .theme-retro p:nth-child(odd) {
   color: #fce4a0;
 }
-/* A plain dark track with a pixel outline */
-.theme-retro + .overlay-scrollbar-frame .overlay-scrollbar-bar::before {
+/* A plain dark track, flush with the box's top, bottom and right edges: it takes in the inset on every side, so the
+   thumb sits in the middle of it. The frame isn't clipped by the box's rounded corners, so the track rounds its own to
+   match (the 8px of .examples .box). */
+.theme-retro + .overlay-scrollbar-frame .overlay-scrollbar-bar-y::before {
+  top: calc(-1 * var(--_osb-inset));
+  bottom: calc(-1 * var(--_osb-inset));
+  right: 0;
+  width: calc(var(--_osb-width) + 2 * var(--_osb-inset));
+  border-radius: 0 8px 8px 0;
   background: rgb(0 0 0 / 0.22);
-  box-shadow: 0 0 0 2px #000;
+}
+.theme-retro + .overlay-scrollbar-frame .overlay-scrollbar-bar-y.overlay-scrollbar-expanded::before {
+  width: calc(var(--_osb-expanded-width) + 2 * var(--_osb-inset));
 }
 /* A question block, rivets in the corners */
 .theme-retro + .overlay-scrollbar-frame .overlay-scrollbar-thumb,
