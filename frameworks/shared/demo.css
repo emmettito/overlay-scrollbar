@@ -1,48 +1,7 @@
-/* The framework demo, identical in Angular, React, Vue and Svelte (see SPEC.md). Styled like the app it's shown in,
-   light or dark as data-theme on the root says (theme.ts). */
-@import '@fontsource-variable/inter';
-
-:root {
-  color-scheme: light;
-  --surface: #fff;
-  --surface-muted: #f7f8f9;
-  --border: #e3e4e8;
-  --border-subtle: #eff0f2;
-  --border-strong: #c9cbd1;
-  --text: #1b1c1f;
-  --text-muted: #6b6f76;
-  --hover: #ebecef;
-  --accent: #5e6ad2;
-  --accent-soft: rgb(94 106 210 / 0.12);
-}
-:root[data-theme='dark'] {
-  color-scheme: dark;
-  --surface: #16171a;
-  --surface-muted: #1b1c20;
-  --border: #2a2c31;
-  --border-subtle: #1f2125;
-  --border-strong: #3b3e45;
-  --text: #e3e4e8;
-  --text-muted: #8a8f98;
-  --hover: #1c1d21;
-  --accent: #7c86e8;
-  --accent-soft: rgb(124 134 232 / 0.16);
-}
-/* The library's bars default to dark thumbs: light ones here, so they show on the dark surfaces. Set on the bars' frame,
-   right after the list, rather than on the root: the bars take the list's colours when they're attached, and the
-   wrappers don't call update() when the theme changes, so colours the list has would stay as they were. */
-:root[data-theme='dark'] .list + * {
-  --osb-thumb-color: rgb(255 255 255 / 0.4);
-  --osb-thumb-hover-color: rgb(255 255 255 / 0.55);
-  --osb-track-color: rgb(255 255 255 / 0.06);
-}
+/* The framework demo, identical in Angular, React, Vue and Svelte (see SPEC.md). Part of the app's page, so in its
+   font and colours (src/styles.css), light or dark with it. */
 .demo {
-  font:
-    13px/1.5 'Inter Variable',
-    system-ui,
-    sans-serif;
   color: var(--text);
-  -webkit-font-smoothing: antialiased;
 }
 .demo .controls {
   display: flex;

@@ -1,5 +1,6 @@
-// Builds the Angular, React, Vue and Svelte demos (frameworks/*) into public/frameworks/<name>/, where the app shows
-// them in iframes. Each needs its own framework's Vite plugin, so each is a Vite app of its own.
+// Builds the Angular, React, Vue and Svelte demos (frameworks/*) into public/frameworks/<name>/demo.js, a script that
+// defines the demo's element, which the app puts on the framework's page. Each needs its own framework's Vite plugin,
+// so each is a Vite build of its own.
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { build } from 'vite';

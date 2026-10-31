@@ -1,9 +1,10 @@
-import { bootstrapApplication } from '@angular/platform-browser';
-import '@emmettito/overlay-scrollbar/overlay-scrollbar.css';
-import '../../shared/demo.css';
-import { followAppTheme } from '../../shared/theme';
+import { createApplication } from '@angular/platform-browser';
+import { defineDemo } from '../../shared/define-demo';
 import { AngularDemo } from './angular-demo.component';
 
-followAppTheme();
-
-bootstrapApplication(AngularDemo).catch(err => console.error(err));
+// An Angular app of its own on each <angular-demo>, with the demo component as its root
+defineDemo('angular-demo', async host => {
+  const app = await createApplication();
+  app.bootstrap(AngularDemo, host);
+  return () => app.destroy();
+});
