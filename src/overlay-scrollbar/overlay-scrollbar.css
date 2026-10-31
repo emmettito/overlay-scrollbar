@@ -4,14 +4,15 @@
 
    An 11px pill track inset 3px from the edges, shown only while the pointer is on the bar; a thumb that is 6px while
    scrolling and fills the track when the pointer is on the bar, with its outer edge fixed so it grows inwards. Shown
-   instantly, faded out as a whole. Black at 50% for the thumb (60% under the pointer) and 4.7% for the track.
+   instantly, faded out as a whole. Black at 50% for the thumb (60% under the pointer) and 4.7% for the track, or white
+   in a dark colour scheme (light-dark(), from the element's color-scheme, which the frame copies).
 
-   The --osb-* custom properties theme it (listed in README.md). The --_osb-* ones, with
-   the leading underscore, are internal: they're set on the frame, by overlay-scrollbar-frame.ts or below, so they
-   never reach the element's content or a nested scroller. */
+   The --osb-* custom properties theme it (listed in README.md). The --_osb-* ones, with the leading underscore, are
+   internal: they're set on the frame, by overlay-scrollbar-frame.ts or below, so they never reach the element's
+   content or a nested scroller. */
 
 /* Outside the layer: whatever else styles the element's scrollbars, the native ones mustn't show under the bars.
-   (scrollbar-width: none, set inline, hides them everywhere else.) */
+   (scrollbar-width: none, important in the layer below, hides them everywhere else.) */
 .overlay-scrollbar-host::-webkit-scrollbar {
   display: none;
 }
@@ -21,13 +22,18 @@
 @layer overlay-scrollbar {
   /* Positioned, so a nested element's frame, absolutely positioned inside it, is clipped by it and scrolls with its
      content: otherwise the frame's containing block is further out, and the nested element's bars would show, and take
-     the pointer, past this element's edges whenever the nested one is partly scrolled out of sight. */
+     the pointer, past this element's edges whenever the nested one is partly scrolled out of sight.
+     The native scrollbars are hidden, the one thing here the page mustn't override: important, and in the first layer,
+     this beats all the page's styles but an important inline one. */
   .overlay-scrollbar-host {
     position: relative;
+    scrollbar-width: none !important;
   }
 
   /* The bars are drawn in a frame placed right after the element and laid over its visible area with CSS anchor
-     positioning (anchor-name on the element, position-anchor on the frame, both set by overlay-scrollbar-frame.ts).
+     positioning (anchor-name on the element, position-anchor on the frame, both set by overlay-scrollbar-frame.ts),
+     with the element's border widths copied onto a transparent border (inline, by overlay-scrollbar-frame.ts), so its
+     padding box is the element's.
      Outside the element, the bars aren't part of its scrolling content, so no browser's bounce past the ends moves
      them. Hidden while the element is out of sight. Contained, so moving and resizing the thumbs never lays out the
      scrolling element: Safari clamps a keyboard scroll back into range whenever it does, which kills the rubber-band. */
@@ -39,10 +45,11 @@
     --_osb-expand: var(--osb-expand-duration, 0.15s) ease-out;
     --_osb-corner: var(--osb-corner, 0px);
     position: absolute;
-    top: calc(anchor(top) + var(--_osb-border-top, 0px));
-    left: calc(anchor(left) + var(--_osb-border-left, 0px));
-    width: var(--_osb-client-width);
-    height: var(--_osb-client-height);
+    top: anchor(top);
+    right: anchor(right);
+    bottom: anchor(bottom);
+    left: anchor(left);
+    border: 0 solid transparent;
     position-visibility: anchors-visible;
     /* Above the page's own content; --_osb-depth is how many attached elements this one is nested in, so
        nested bars go above their parents'. A known limit: it's also above overlays with a lower z-index (README.md). */
@@ -101,25 +108,34 @@
   }
 
   .overlay-scrollbar-expanded::before {
-    background-color: var(--osb-track-color, rgb(0 0 0 / 0.047));
+    background-color: var(--osb-track-color, light-dark(rgb(0 0 0 / 0.047), rgb(255 255 255 / 0.047)));
   }
 
   .overlay-scrollbar-thumb {
     position: absolute;
     border-radius: var(--_osb-radius);
-    background-color: var(--osb-thumb-color, rgb(0 0 0 / 0.5));
+    background-color: var(--osb-thumb-color, light-dark(rgb(0 0 0 / 0.5), rgb(255 255 255 / 0.5)));
   }
 
   .overlay-scrollbar-thumb:hover,
   .overlay-scrollbar-dragging > .overlay-scrollbar-thumb {
-    background-color: var(--osb-thumb-hover-color, rgb(0 0 0 / 0.6));
+    background-color: var(--osb-thumb-hover-color, light-dark(rgb(0 0 0 / 0.6), rgb(255 255 255 / 0.6)));
   }
 
+  /* Physical sides, whatever the page's writing mode: the vertical bar on the right (the left in RTL, with
+     .overlay-scrollbar-bar-y-left), the horizontal bar at the bottom. Each thumb starts where its content starts: on
+     the right with .overlay-scrollbar-reverse-x (RTL, vertical-rl), at the bottom with .overlay-scrollbar-reverse-y
+     (vertical lines that run upwards). See utilities/scroll-axes.ts. */
   .overlay-scrollbar-bar-y {
     top: var(--_osb-inset);
     bottom: var(--_osb-inset);
-    inset-inline-end: 0;
+    right: 0;
     width: calc(var(--_osb-expanded-width) + var(--_osb-inset));
+  }
+
+  .overlay-scrollbar-bar-y-left > .overlay-scrollbar-bar-y {
+    right: auto;
+    left: 0;
   }
 
   .overlay-scrollbar-both > .overlay-scrollbar-bar-y {
@@ -128,8 +144,9 @@
 
   /* The track grows with the thumb, from the same fixed outer edge */
   .overlay-scrollbar-bar-y::before {
-    inset-block: 0;
-    inset-inline-end: var(--_osb-inset);
+    top: 0;
+    bottom: 0;
+    right: var(--_osb-inset);
     width: var(--_osb-width);
     transition: width var(--_osb-expand);
   }
@@ -140,10 +157,21 @@
 
   .overlay-scrollbar-bar-y > .overlay-scrollbar-thumb {
     top: 0;
-    inset-inline-end: var(--_osb-inset);
+    right: var(--_osb-inset);
     width: var(--_osb-width);
     height: var(--_osb-thumb-y);
     transition: width var(--_osb-expand);
+  }
+
+  .overlay-scrollbar-bar-y-left > .overlay-scrollbar-bar-y::before,
+  .overlay-scrollbar-bar-y-left > .overlay-scrollbar-bar-y > .overlay-scrollbar-thumb {
+    right: auto;
+    left: var(--_osb-inset);
+  }
+
+  .overlay-scrollbar-reverse-y > .overlay-scrollbar-bar-y > .overlay-scrollbar-thumb {
+    top: auto;
+    bottom: 0;
   }
 
   .overlay-scrollbar-bar-y.overlay-scrollbar-expanded > .overlay-scrollbar-thumb {
@@ -152,16 +180,24 @@
 
   .overlay-scrollbar-bar-x {
     bottom: 0;
-    inset-inline: var(--_osb-inset);
+    left: var(--_osb-inset);
+    right: var(--_osb-inset);
     height: calc(var(--_osb-expanded-width) + var(--_osb-inset));
   }
 
+  /* The corner is on the vertical bar's side */
   .overlay-scrollbar-both > .overlay-scrollbar-bar-x {
-    inset-inline-end: calc(var(--_osb-inset) + var(--_osb-corner));
+    right: calc(var(--_osb-inset) + var(--_osb-corner));
+  }
+
+  .overlay-scrollbar-both.overlay-scrollbar-bar-y-left > .overlay-scrollbar-bar-x {
+    right: var(--_osb-inset);
+    left: calc(var(--_osb-inset) + var(--_osb-corner));
   }
 
   .overlay-scrollbar-bar-x::before {
-    inset-inline: 0;
+    left: 0;
+    right: 0;
     bottom: var(--_osb-inset);
     height: var(--_osb-width);
     transition: height var(--_osb-expand);
@@ -173,10 +209,15 @@
 
   .overlay-scrollbar-bar-x > .overlay-scrollbar-thumb {
     bottom: var(--_osb-inset);
-    inset-inline-start: 0;
+    left: 0;
     width: var(--_osb-thumb-x);
     height: var(--_osb-width);
     transition: height var(--_osb-expand);
+  }
+
+  .overlay-scrollbar-reverse-x > .overlay-scrollbar-bar-x > .overlay-scrollbar-thumb {
+    left: auto;
+    right: 0;
   }
 
   .overlay-scrollbar-bar-x.overlay-scrollbar-expanded > .overlay-scrollbar-thumb {

@@ -221,6 +221,39 @@ describe('OverlayScrollbarBar', () => {
     });
   });
 
+  describe('right-clicking', () => {
+    const onMac = (platform: string): void => {
+      Object.defineProperty(navigator, 'platform', { configurable: true, get: () => platform });
+    };
+
+    afterEach(() => {
+      // Back to jsdom's own, on Navigator.prototype
+      Reflect.deleteProperty(navigator, 'platform');
+    });
+
+    it('opens no context menu on the bar or the thumb', () => {
+      for (const target of [bar.element, bar.thumb]) {
+        const event = new MouseEvent('contextmenu', { bubbles: true, cancelable: true, button: 2 });
+        target.dispatchEvent(event);
+        expect(event.defaultPrevented).toBe(true);
+      }
+    });
+
+    it("treats a Mac's Control-click as a right-click, neither paging nor dragging", () => {
+      onMac('MacIntel');
+      bar.element.dispatchEvent(pointer('pointerdown', { clientY: 60, ctrlKey: true }));
+      bar.thumb.dispatchEvent(pointer('pointerdown', { clientY: 10, ctrlKey: true }));
+      expect(host.scrollBy).not.toHaveBeenCalled();
+      expect(bar.element.classList).not.toContain('overlay-scrollbar-dragging');
+    });
+
+    it('pages on a Control-click elsewhere, where it is a plain click', () => {
+      onMac('Win32');
+      bar.element.dispatchEvent(pointer('pointerdown', { clientY: 60, ctrlKey: true }));
+      expect(host.scrollBy).toHaveBeenCalledWith({ top: 90, behavior: 'smooth' });
+    });
+  });
+
   it('starts one hover delay however many pointers come onto it, and none once they have all left', () => {
     // A mouse and a pen, both passing over within the delay
     bar.element.dispatchEvent(pointer('pointerenter'));

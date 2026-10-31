@@ -1,6 +1,7 @@
 // What an app includes in its global styles
 import { OverlayScrollbarRef } from './models/overlay-scrollbar-ref.js';
 import './overlay-scrollbar.css';
+import stylesheet from './overlay-scrollbar.css?raw';
 import { attachOverlayScrollbar } from './overlay-scrollbar.js';
 import { thumbsUseScrollTimeline } from './utilities/thumbs-use-scroll-timeline.js';
 
@@ -40,6 +41,19 @@ describe('overlay scrollbars in a real browser', () => {
   const part = (host: HTMLElement, selector: string): HTMLElement =>
     (host.nextElementSibling as HTMLElement).querySelector(selector) as HTMLElement;
   const rect = (host: HTMLElement, selector: string): DOMRect => part(host, selector).getBoundingClientRect();
+  // The frame's padding box, where the bars sit: its border matches the element's
+  const frameInside = (host: HTMLElement): { top: number; left: number; width: number; height: number } => {
+    const frame = host.nextElementSibling as HTMLElement;
+    const { top, left } = frame.getBoundingClientRect();
+    return {
+      top: top + frame.clientTop,
+      left: left + frame.clientLeft,
+      width: frame.clientWidth,
+      height: frame.clientHeight
+    };
+  };
+  const thumbColor = (host: HTMLElement): string =>
+    getComputedStyle(part(host, '.overlay-scrollbar-bar-y .overlay-scrollbar-thumb')).backgroundColor;
 
   afterEach(() => {
     refs.splice(0).forEach(ref => ref.destroy());
@@ -49,6 +63,18 @@ describe('overlay scrollbars in a real browser', () => {
 
   it('hides the native scrollbars', async () => {
     const host = attach(tallAndWide);
+    await frames();
+    expect(host.offsetWidth - host.clientWidth).toBe(0);
+    expect(host.offsetHeight - host.clientHeight).toBe(0);
+  });
+
+  it('hides the native scrollbars whatever scrollbar-width the page gives the element, inline or not', async () => {
+    const style = document.createElement('style');
+    style.dataset['test'] = '';
+    style.textContent = '.thin-scrollbars { scrollbar-width: thin; }';
+    document.head.appendChild(style);
+    const host = attach(tallAndWide, 'scrollbar-width: auto');
+    host.classList.add('thin-scrollbars');
     await frames();
     expect(host.offsetWidth - host.clientWidth).toBe(0);
     expect(host.offsetHeight - host.clientHeight).toBe(0);
@@ -111,6 +137,82 @@ describe('overlay scrollbars in a real browser', () => {
     expect(rect(host, '.overlay-scrollbar-bar-y').left).toBeCloseTo(box.left, 0);
     const track = rect(host, '.overlay-scrollbar-bar-x');
     expect(rect(host, '.overlay-scrollbar-bar-x .overlay-scrollbar-thumb').right).toBeCloseTo(track.right, 0);
+  });
+
+  describe('in vertical text', () => {
+    // Each thumb starts where its content does: on the right where lines run right to left, at the bottom where each
+    // line runs upwards (utilities/scroll-axes.ts)
+    it.each([
+      ['vertical-rl', 'ltr', true, false],
+      ['vertical-rl', 'rtl', true, true],
+      ['vertical-lr', 'ltr', false, false],
+      ['vertical-lr', 'rtl', false, true],
+      ['sideways-rl', 'ltr', true, false],
+      ['sideways-lr', 'ltr', false, true]
+    ])(
+      '%s %s: the bars on the right and bottom, each thumb running from where its content starts to where it ends',
+      async (writingMode, direction, fromRight, fromBottom) => {
+        const host = attach(tallAndWide, `writing-mode: ${writingMode}; direction: ${direction}`);
+        await frames();
+        const box = host.getBoundingClientRect();
+        const trackX = rect(host, '.overlay-scrollbar-bar-x');
+        const trackY = rect(host, '.overlay-scrollbar-bar-y');
+        const thumbX = (): DOMRect => rect(host, '.overlay-scrollbar-bar-x .overlay-scrollbar-thumb');
+        const thumbY = (): DOMRect => rect(host, '.overlay-scrollbar-bar-y .overlay-scrollbar-thumb');
+        expect(trackY.right).toBeCloseTo(box.right, 0);
+        expect(trackX.bottom).toBeCloseTo(box.bottom, 0);
+        expect(fromRight ? thumbX().right : thumbX().left).toBeCloseTo(fromRight ? trackX.right : trackX.left, 0);
+        expect(fromBottom ? thumbY().bottom : thumbY().top).toBeCloseTo(fromBottom ? trackY.bottom : trackY.top, 0);
+
+        // To the far end of both: scrollLeft and scrollTop run from 0 down where the content starts right or bottom
+        host.scrollLeft = (fromRight ? -1 : 1) * host.scrollWidth;
+        host.scrollTop = (fromBottom ? -1 : 1) * host.scrollHeight;
+        await frames();
+        expect(fromRight ? thumbX().left : thumbX().right).toBeCloseTo(fromRight ? trackX.left : trackX.right, 0);
+        expect(fromBottom ? thumbY().top : thumbY().bottom).toBeCloseTo(fromBottom ? trackY.top : trackY.bottom, 0);
+      }
+    );
+
+    it('follows a change of writing mode once the pointer comes onto the bars', async () => {
+      const host = attach(tallAndWide);
+      await frames();
+      host.style.writingMode = 'vertical-rl';
+      (host.nextElementSibling as HTMLElement).dispatchEvent(new PointerEvent('pointerover', { bubbles: true }));
+      await frames();
+      const track = rect(host, '.overlay-scrollbar-bar-x');
+      expect(rect(host, '.overlay-scrollbar-bar-x .overlay-scrollbar-thumb').right).toBeCloseTo(track.right, 0);
+    });
+
+    it('jumps to the spot option-clicked from the bottom, where each line runs upwards', async () => {
+      const host = attach(tallAndWide, 'writing-mode: vertical-rl; direction: rtl');
+      await frames();
+      const track = rect(host, '.overlay-scrollbar-bar-y');
+      // Near the top of the track: near the end of the content, which starts at the bottom
+      part(host, '.overlay-scrollbar-bar-y').dispatchEvent(
+        new PointerEvent('pointerdown', {
+          bubbles: true,
+          button: 0,
+          altKey: true,
+          clientX: track.left + track.width / 2,
+          clientY: track.top + 1
+        })
+      );
+      await frames();
+      expect(host.scrollTop).toBeCloseTo(-(host.scrollHeight - host.clientHeight), 0);
+    });
+  });
+
+  it('places the bars on the right of a horizontal element in a page of vertical text', async () => {
+    document.body.style.writingMode = 'vertical-rl';
+    try {
+      const host = attach(tallAndWide, 'writing-mode: horizontal-tb');
+      await frames();
+      const box = host.getBoundingClientRect();
+      expect(rect(host, '.overlay-scrollbar-bar-y').right).toBeCloseTo(box.right, 0);
+      expect(rect(host, '.overlay-scrollbar-bar-x').bottom).toBeCloseTo(box.bottom, 0);
+    } finally {
+      document.body.style.writingMode = '';
+    }
   });
 
   it('follows the content growing and shrinking', async () => {
@@ -225,6 +327,72 @@ describe('overlay scrollbars in a real browser', () => {
     );
   });
 
+  it("follows the element's colour scheme: dark bars by default, light ones in a dark scheme", async () => {
+    const light = attach(tall);
+    const dark = attach(tall, 'color-scheme: dark');
+    await frames();
+    expect(thumbColor(light)).toBe('rgba(0, 0, 0, 0.5)');
+    expect(thumbColor(dark)).toBe('rgba(255, 255, 255, 0.5)');
+  });
+
+  it("follows the page's colour scheme switching, with nothing measured again", async () => {
+    const host = attach(tall);
+    await frames();
+    document.body.style.colorScheme = 'dark';
+    try {
+      await frames();
+      expect(thumbColor(host)).toBe('rgba(255, 255, 255, 0.5)');
+    } finally {
+      document.body.style.colorScheme = '';
+    }
+  });
+
+  it("follows the element's own colour scheme changing once the pointer comes onto the bars", async () => {
+    const host = attach(tall, 'color-scheme: dark');
+    await frames();
+    host.style.colorScheme = 'light';
+    (host.nextElementSibling as HTMLElement).dispatchEvent(new PointerEvent('pointerover', { bubbles: true }));
+    await frames();
+    expect(thumbColor(host)).toBe('rgba(0, 0, 0, 0.5)');
+  });
+
+  it("keeps the element's own colour scheme, once the pointer comes onto the bars, when it matched the page's and the page's switches", async () => {
+    // A light panel on a light page: the frame inherits the page's scheme, the same as the element's
+    const host = attach(tall, 'color-scheme: light');
+    document.body.style.colorScheme = 'light';
+    try {
+      await frames();
+      document.body.style.colorScheme = 'dark';
+      (host.nextElementSibling as HTMLElement).dispatchEvent(new PointerEvent('pointerover', { bubbles: true }));
+      await frames();
+      expect(thumbColor(host)).toBe('rgba(0, 0, 0, 0.5)');
+    } finally {
+      document.body.style.colorScheme = '';
+    }
+  });
+
+  it('draws the bars in a shadow root that loads the stylesheet itself', async () => {
+    const outer = document.createElement('div');
+    document.body.appendChild(outer);
+    hosts.push(outer);
+    const shadow = outer.attachShadow({ mode: 'open' });
+    const sheet = new CSSStyleSheet();
+    sheet.replaceSync(stylesheet);
+    shadow.adoptedStyleSheets = [sheet];
+    shadow.innerHTML = `<div style="width: 200px; height: 150px; overflow: auto">${tallAndWide}</div>`;
+    const host = shadow.firstElementChild as HTMLElement;
+    refs.push(attachOverlayScrollbar(host, { force: true }));
+    await frames();
+    const box = host.getBoundingClientRect();
+    expect(rect(host, '.overlay-scrollbar-bar-y').right).toBeCloseTo(box.right, 0);
+    expect(rect(host, '.overlay-scrollbar-bar-x').bottom).toBeCloseTo(box.bottom, 0);
+    const track = rect(host, '.overlay-scrollbar-bar-y');
+    expect(rect(host, '.overlay-scrollbar-bar-y .overlay-scrollbar-thumb').height).toBeCloseTo(
+      (track.height * 150) / 1000,
+      0
+    );
+  });
+
   it('takes its sizes from the custom properties', async () => {
     const host = attach(tall, '--osb-width: 10px; --osb-inset: 8px');
     await frames();
@@ -245,6 +413,60 @@ describe('overlay scrollbars in a real browser', () => {
     expect(rect(host, '.overlay-scrollbar-bar-y .overlay-scrollbar-thumb').width).toBe(9);
   });
 
+  it("inherits the page's custom properties, copying none onto the frame, and follows them changing", async () => {
+    document.body.style.setProperty('--osb-width', '9px');
+    try {
+      const host = attach(tall);
+      await frames();
+      expect(rect(host, '.overlay-scrollbar-bar-y .overlay-scrollbar-thumb').width).toBe(9);
+      expect((host.nextElementSibling as HTMLElement).getAttribute('style')).not.toContain('--osb-width');
+      // A theme switched on the page, with nothing measured again (the thumb's width then transitions to it)
+      document.body.style.setProperty('--osb-width', '10px');
+      await frames();
+      expect(getComputedStyle(host.nextElementSibling as HTMLElement).getPropertyValue('--osb-width')).toBe('10px');
+    } finally {
+      document.body.style.removeProperty('--osb-width');
+    }
+  });
+
+  it("keeps the element's own custom property, once the pointer comes onto the bars, when it matched the page's and the page's changes", async () => {
+    document.body.style.setProperty('--osb-width', '9px');
+    try {
+      const host = attach(tall, '--osb-width: 9px');
+      await frames();
+      document.body.style.setProperty('--osb-width', '10px');
+      (host.nextElementSibling as HTMLElement).dispatchEvent(new PointerEvent('pointerover', { bubbles: true }));
+      await frames();
+      expect(getComputedStyle(host.nextElementSibling as HTMLElement).getPropertyValue('--osb-width')).toBe('9px');
+    } finally {
+      document.body.style.removeProperty('--osb-width');
+    }
+  });
+
+  it("takes the defaults where the element undoes the page's custom properties with initial", async () => {
+    document.body.style.setProperty('--osb-thumb-color', 'rgb(0, 255, 0)');
+    try {
+      const host = attach(tall, '--osb-thumb-color: initial');
+      await frames();
+      expect(thumbColor(host)).toBe('rgba(0, 0, 0, 0.5)');
+    } finally {
+      document.body.style.removeProperty('--osb-thumb-color');
+    }
+  });
+
+  it("keeps its border transparent over the element's, whatever border a reset gives every element", async () => {
+    const style = document.createElement('style');
+    style.dataset['test'] = '';
+    // As Tailwind's preflight does, in a layer after the library's
+    style.textContent = '@layer base { *, ::before, ::after { border: 0 solid; } }';
+    document.head.appendChild(style);
+    const host = attach(tall, 'border: 2px solid rgb(255, 0, 0)');
+    await frames();
+    const frame = getComputedStyle(host.nextElementSibling as HTMLElement);
+    expect(frame.borderTopWidth).toBe('2px');
+    expect(frame.borderTopColor).toBe('rgba(0, 0, 0, 0)');
+  });
+
   it("lays the frame over the element's visible area, inside its border, and keeps it there while scrolling", async () => {
     const host = attach(tallAndWide, 'border: 4px solid; border-top-width: 7px; margin: 10px');
     await frames();
@@ -252,7 +474,7 @@ describe('overlay scrollbars in a real browser', () => {
       host.scrollTop = top;
       await frames();
       const box = host.getBoundingClientRect();
-      const frame = (host.nextElementSibling as HTMLElement).getBoundingClientRect();
+      const frame = frameInside(host);
       expect(frame.top).toBeCloseTo(box.top + 7, 0);
       expect(frame.left).toBeCloseTo(box.left + 4, 0);
       expect(frame.width).toBeCloseTo(host.clientWidth, 0);
@@ -322,7 +544,7 @@ describe('overlay scrollbars in a real browser', () => {
       host.style.borderWidth = '20px';
       await frames();
       // The frame covers the padding box, inside the border
-      const frame = (host.nextElementSibling as HTMLElement).getBoundingClientRect();
+      const frame = frameInside(host);
       const box = host.getBoundingClientRect();
       expect(frame.width).toBeCloseTo(host.clientWidth, 0);
       expect(frame.height).toBeCloseTo(host.clientHeight, 0);
@@ -357,6 +579,8 @@ describe('overlay scrollbars in a real browser', () => {
     }
     // The page's two names, one axis each, then the bars' own x and y
     expect(host.style.getPropertyValue('scroll-timeline-axis')).toBe('block, block, x, y');
+    // Written inline as the one shorthand
+    expect(host.getAttribute('style')).toMatch(/scroll-timeline: --a, --b, --osb-\d+-x x, --osb-\d+-y y;/);
     // Scrolling only down leaves the horizontal thumb at its start
     host.scrollTop = host.scrollHeight;
     await frames();

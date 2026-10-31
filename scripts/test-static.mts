@@ -19,6 +19,7 @@ const routes = {
   nested: 5,
   dialog: 1,
   rtl: 2,
+  vertical: 1,
   virtual: 1,
   'drag-drop': 2,
   styling: 26,

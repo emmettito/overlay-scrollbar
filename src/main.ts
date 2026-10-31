@@ -14,6 +14,7 @@ import { nested } from './demos/nested';
 import { Bars, find, Page } from './demos/page';
 import { rtl } from './demos/rtl';
 import { styling } from './demos/styling/styling';
+import { vertical } from './demos/vertical';
 import { virtual } from './demos/virtual';
 import { navMenu } from './menu';
 import { themeToggle } from './theme';
@@ -26,6 +27,7 @@ const pages: Record<string, Page> = {
   nested,
   dialog,
   rtl,
+  vertical,
   virtual,
   'drag-drop': dragDrop,
   styling,

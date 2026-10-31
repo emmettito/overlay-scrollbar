@@ -61,7 +61,8 @@ export function attachOverlayScrollbar(host: HTMLElement, options: OverlayScroll
       frame = undefined;
     }
   };
-  const unwatch = resolved.force ? undefined : watchScrollbarStyle(sync);
+  // Without anchor positioning the bars are never drawn, whatever the scrollbar style
+  const unwatch = resolved.force || !supportsAnchorPositioning() ? undefined : watchScrollbarStyle(sync);
   let destroyed = false;
   const ref: OverlayScrollbarRef = {
     update: () => frame?.update(),

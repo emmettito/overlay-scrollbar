@@ -86,20 +86,18 @@ describe('attachOverlayScrollbar', () => {
     expect(document.body.children.length).toBe(before);
   });
 
-  it('draws the bars, hiding the native scrollbar, and cleans up on destroy', () => {
+  it('draws the bars, and cleans up on destroy', () => {
     ref = attachOverlayScrollbar(host, { force: true });
     // What the ResizeObserver's first notification does once the element has rendered (jsdom never sends one)
     ref.update();
     expect(frameOf(host)?.getAttribute('aria-hidden')).toBe('true');
     expect(host.classList).toContain('overlay-scrollbar-host');
-    expect(host.style.getPropertyValue('scrollbar-width')).toBe('none');
     expect((frameOf(host)?.querySelector('.overlay-scrollbar-bar-y') as HTMLElement).hidden).toBe(false);
     expect((frameOf(host)?.querySelector('.overlay-scrollbar-bar-x') as HTMLElement).hidden).toBe(true);
 
     ref.destroy();
     expect(frameOf(host)).toBeNull();
     expect(host.classList).not.toContain('overlay-scrollbar-host');
-    expect(host.style.getPropertyValue('scrollbar-width')).toBe('');
   });
 
   it('replaces the bars when attached again, so destroying either leaves the element as it was', () => {
@@ -112,11 +110,9 @@ describe('attachOverlayScrollbar', () => {
     first.destroy();
     expect(frameOf(host)).not.toBeNull();
     expect(host.classList).toContain('overlay-scrollbar-host');
-    expect(host.style.getPropertyValue('scrollbar-width')).toBe('none');
 
     ref.destroy();
     expect(frameOf(host)).toBeNull();
-    expect(host.style.getPropertyValue('scrollbar-width')).toBe('');
   });
 
   it('draws the bars on an element attached before it is in the page, once it is added', async () => {
@@ -124,7 +120,6 @@ describe('attachOverlayScrollbar', () => {
     ref = attachOverlayScrollbar(host, { force: true });
     // Nothing yet, so it keeps its own scrollbars meanwhile
     expect(host.classList).not.toContain('overlay-scrollbar-host');
-    expect(host.style.getPropertyValue('scrollbar-width')).toBe('');
 
     document.body.appendChild(host);
     await settle();
@@ -231,7 +226,7 @@ describe('attachOverlayScrollbar', () => {
     expect(host.style.getPropertyValue('anchor-name')).toBe(`--osb-${before + 1}`);
   });
 
-  it("puts back the element's own inline scrollbar-width and the stylesheet's names on destroy", () => {
+  it("leaves the element's own inline scrollbar-width alone, and puts back the stylesheet's names on destroy", () => {
     const style = document.createElement('style');
     style.textContent = '.tooltip-anchor { anchor-name: --tip; }';
     document.head.appendChild(style);
@@ -241,6 +236,7 @@ describe('attachOverlayScrollbar', () => {
     ref.update();
     // The stylesheet's name is kept alongside the bars' own while they're attached
     expect(host.style.getPropertyValue('anchor-name')).toMatch(/^--tip, --osb-\d+$/);
+    expect(host.style.getPropertyValue('scrollbar-width')).toBe('thin');
 
     ref.destroy();
     host.classList.remove('tooltip-anchor');
@@ -745,7 +741,7 @@ describe('the drawn frame', () => {
     const innerRef = attachOverlayScrollbar(inner, { force: true });
     ref.update();
     innerRef.update();
-    expect(frameCustomProperty(host, '--_osb-depth')).toBe('0');
+    expect(frameCustomProperty(host, '--_osb-depth')).toBe('');
     expect(frameCustomProperty(inner, '--_osb-depth')).toBe('1');
     innerRef.destroy();
   });
