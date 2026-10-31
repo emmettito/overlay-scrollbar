@@ -11,7 +11,7 @@ import './customise/layers.css';
 import './customise/light-panel.css';
 import './customise/slow.css';
 import './styling-base.css';
-import './themes/cyberspace.css';
+import './themes/neon.css';
 import './themes/peppermint.css';
 import './themes/rainbow.css';
 import './themes/retro.css';
@@ -100,7 +100,7 @@ const groups: { title: string; examples: Example[] }[] = [
     examples: [
       { name: 'Retro', className: 'theme-retro', css: './themes/retro.css', rows: lines },
       { name: 'Rainbow', className: 'theme-rainbow', css: './themes/rainbow.css', rows: lines },
-      { name: 'Cyberspace', className: 'theme-cyberspace', css: './themes/cyberspace.css', rows: lines },
+      { name: 'Neon', className: 'theme-neon', css: './themes/neon.css', rows: lines },
       { name: 'Peppermint', className: 'theme-peppermint', css: './themes/peppermint.css', rows: lines }
     ]
   }
