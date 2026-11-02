@@ -62,6 +62,13 @@
     -webkit-touch-callout: none;
   }
 
+  /* An element that's position: fixed isn't an anchor an absolutely positioned frame can use whenever their containing
+     blocks differ, as they do inside any positioned ancestor, and the frame would scroll with the page if it could. A
+     fixed frame has the same containing block as the element, its sibling. */
+  .overlay-scrollbar-fixed {
+    position: fixed;
+  }
+
   /* The bar is the whole edge strip, inset included, so the edge of the box is hoverable */
   /* touch-action: a touch on the bar drags the thumb or pages, rather than panning the content (the opposite way) */
   .overlay-scrollbar-bar {
