@@ -634,6 +634,122 @@ describe('overlay scrollbars in a real browser', () => {
     expect(rect(host, '.overlay-scrollbar-thumb').height).toBeGreaterThan(0);
   });
 
+  describe('on a position: fixed element', () => {
+    const fixed = 'position: fixed; top: 40px; left: 60px; border: 1px solid';
+    const wrappers: HTMLElement[] = [];
+
+    // Inside a wrapper, as an overlay library would place it
+    function attachIn(wrapperStyle: string): HTMLElement {
+      const wrapper = document.createElement('div');
+      wrapper.style.cssText = wrapperStyle;
+      document.body.appendChild(wrapper);
+      wrappers.push(wrapper);
+      const host = document.createElement('div');
+      host.style.cssText = `width: 200px; height: 150px; overflow: auto; ${fixed}`;
+      host.innerHTML = tall;
+      wrapper.appendChild(host);
+      refs.push(attachOverlayScrollbar(host, { force: true, autoHide: false }));
+      return host;
+    }
+
+    const expectBarsOver = (host: HTMLElement): void => {
+      const box = host.getBoundingClientRect();
+      const frame = (host.nextElementSibling as HTMLElement).getBoundingClientRect();
+      expect(frame.top).toBeCloseTo(box.top, 0);
+      expect(frame.left).toBeCloseTo(box.left, 0);
+      expect(frame.width).toBeCloseTo(box.width, 0);
+      expect(frame.height).toBeCloseTo(box.height, 0);
+    };
+
+    afterEach(() => {
+      refs.splice(0).forEach(ref => ref.destroy());
+      wrappers.splice(0).forEach(wrapper => wrapper.remove());
+      window.scrollTo(0, 0);
+    });
+
+    it.each([
+      ['no positioned ancestor', ''],
+      ['an absolutely positioned ancestor', 'position: absolute; inset: 0'],
+      ['a fixed ancestor', 'position: fixed; inset: 0'],
+      ['a relatively positioned ancestor', 'position: relative'],
+      ['a transformed ancestor', 'position: absolute; inset: 0; transform: translateX(10px)']
+    ])('lays the bars over it, inside %s, also with the page scrolled', async (_, wrapperStyle) => {
+      const host = attachIn(wrapperStyle);
+      const spacer = wrappers[0].appendChild(document.createElement('div'));
+      spacer.style.height = '3000px';
+      await frames();
+      expectBarsOver(host);
+      window.scrollTo(0, 500);
+      await frames();
+      expectBarsOver(host);
+    });
+
+    it('lays the bars over it inside another element with bars', async () => {
+      const outer = attach(tall, 'height: 100px');
+      const inner = document.createElement('div');
+      inner.style.cssText = `width: 200px; height: 150px; overflow: auto; ${fixed}`;
+      inner.innerHTML = tall;
+      outer.append(inner);
+      refs.push(attachOverlayScrollbar(inner, { force: true, autoHide: false }));
+      await frames();
+      expectBarsOver(inner);
+    });
+
+    it('moves the thumb from end to end of the track as it scrolls', async () => {
+      const host = attachIn('position: absolute; inset: 0');
+      await frames();
+      const track = rect(host, '.overlay-scrollbar-bar-y');
+      expect(rect(host, '.overlay-scrollbar-bar-y .overlay-scrollbar-thumb').top).toBeCloseTo(track.top, 0);
+      host.scrollTop = host.scrollHeight;
+      await frames();
+      expect(rect(host, '.overlay-scrollbar-bar-y .overlay-scrollbar-thumb').bottom).toBeCloseTo(track.bottom, 0);
+    });
+
+    it('takes the pointer on its bars', async () => {
+      const host = attachIn('position: absolute; inset: 0');
+      await frames();
+      const box = host.getBoundingClientRect();
+      const hit = document.elementFromPoint(box.right - 2, box.top + 60);
+      expect(hit?.closest('.overlay-scrollbar-bar-y')).toBe(part(host, '.overlay-scrollbar-bar-y'));
+    });
+
+    it('follows the element becoming fixed, and no longer fixed, on update()', async () => {
+      const wrapper = document.createElement('div');
+      wrapper.style.cssText = 'position: absolute; inset: 0';
+      document.body.appendChild(wrapper);
+      wrappers.push(wrapper);
+      const host = document.createElement('div');
+      host.style.cssText = 'width: 200px; height: 150px; overflow: auto';
+      host.innerHTML = tall;
+      wrapper.appendChild(host);
+      const ref = attachOverlayScrollbar(host, { force: true });
+      refs.push(ref);
+      await frames();
+      expectBarsOver(host);
+
+      host.style.position = 'fixed';
+      host.style.top = '40px';
+      host.style.left = '60px';
+      ref.update();
+      await frames();
+      expectBarsOver(host);
+
+      host.style.position = '';
+      ref.update();
+      await frames();
+      expectBarsOver(host);
+    });
+
+    it('follows the element becoming fixed once the pointer comes onto the bars', async () => {
+      const host = attach(tall);
+      await frames();
+      host.style.position = 'fixed';
+      (host.nextElementSibling as HTMLElement).dispatchEvent(new PointerEvent('pointerover', { bubbles: true }));
+      await frames();
+      expect(getComputedStyle(host.nextElementSibling as HTMLElement).position).toBe('fixed');
+    });
+  });
+
   describe('nested in another element with bars', () => {
     // The outer element with its own style left unpositioned: the stylesheet positions it. The nested one starts 100px
     // down, so its lower part is out of sight.

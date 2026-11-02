@@ -114,6 +114,7 @@ export function drawOverlayScrollbarFrame(
   let axes: ScrollAxes = scrollAxes('', '');
   // The element's colour scheme, and the same again only where it isn't what the frame inherits from its parent
   let colorScheme = '';
+  let fixed = false;
   let ownColorScheme = '';
   let theme: string[] = [];
   let scrollsX = false;
@@ -238,6 +239,7 @@ export function drawOverlayScrollbarFrame(
       }
       axes = scrollAxes(style.writingMode, style.direction);
       colorScheme = style.colorScheme;
+      fixed = style.position === 'fixed';
       const parentStyle = frame.parentElement && getComputedStyle(frame.parentElement);
       ownColorScheme = colorScheme === parentStyle?.colorScheme ? '' : colorScheme;
       // initial where the element undoes its parent's (e.g. with initial itself), as the frame would inherit it
@@ -281,6 +283,7 @@ export function drawOverlayScrollbarFrame(
       if (frame.style.colorScheme !== ownColorScheme) {
         frame.style.colorScheme = ownColorScheme;
       }
+      frame.classList.toggle('overlay-scrollbar-fixed', fixed);
       frame.classList.toggle('overlay-scrollbar-reverse-x', axes.reverseX);
       frame.classList.toggle('overlay-scrollbar-reverse-y', axes.reverseY);
       frame.classList.toggle('overlay-scrollbar-bar-y-left', axes.barYLeft);
@@ -370,8 +373,8 @@ export function drawOverlayScrollbarFrame(
     placeThumb(barY, true, axes.reverseY, axes.reverseY ? -top : top, Math.max(0, scrollHeight - clientHeight));
   };
 
-  // Re-measures what no ResizeObserver sees, whenever the bars are about to show: the direction, writing mode or colour
-  // scheme changing (e.g. switching to a right-to-left language), and content changing size deeper down than the
+  // Re-measures what no ResizeObserver sees, whenever the bars are about to show: the direction, writing mode, colour
+  // scheme or position changing (e.g. switching to a right-to-left language), and content changing size deeper down than the
   // element's children (e.g. rows widening inside a virtual list's wrapper). The frame's own colour scheme and theme are
   // checked against the element's: the element's changing, or the frame inheriting where the element's matched the
   // page's, which may be the element's own and stay when the page's changes (a light panel on a page switched to dark).
@@ -381,6 +384,7 @@ export function drawOverlayScrollbarFrame(
     if (
       !sameAxes(scrollAxes(style.writingMode, style.direction), axes) ||
       style.colorScheme !== colorScheme ||
+      (style.position === 'fixed') !== fixed ||
       frameStyle.colorScheme !== style.colorScheme ||
       THEME_PROPERTIES.some(property => frameStyle.getPropertyValue(property) !== style.getPropertyValue(property)) ||
       host.scrollWidth !== scrollWidth ||
