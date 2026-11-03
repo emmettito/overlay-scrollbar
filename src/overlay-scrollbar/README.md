@@ -1,6 +1,6 @@
 # overlay-scrollbar
 
-Overlay scrollbars for any scrollable element, in plain TypeScript with no dependencies.
+Adequate overlay scrollbars.
 
 The bars show wherever there's a mouse or trackpad. Touch-only devices, and browsers without CSS anchor positioning, keep their native scrollbars.
 
