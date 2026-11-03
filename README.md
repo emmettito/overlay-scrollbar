@@ -1,6 +1,6 @@
 # overlay-scrollbar
 
-Overlay scrollbars for any scrollable element, in plain TypeScript with no dependencies.
+Adequate overlay scrollbars.
 
 See them in the [demo app](https://emmettito.github.io/overlay-scrollbar/).
 
